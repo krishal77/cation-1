@@ -1543,7 +1543,7 @@ function AudioGuideScreen({ onBack, selectedSite }: { onBack: () => void; select
             className="flex items-center gap-1.5 bg-[#EAF6DD] text-[#23351F] border border-[#CAE5B1] text-xs font-bold px-3 py-1.5 rounded-full hover:bg-[#CAE5B1]/50 transition-all"
           >
             <Key size={12} className="text-[#69A20D]" />
-            <span>{apiKey ? 'Grok Active' : 'Set API Key'}</span>
+            <span>{apiKey ? (apiKey.startsWith('AIza') ? 'Gemini Active' : 'Grok Active') : 'Set API Key'}</span>
           </button>
           <button
             onClick={handleRateChange}
@@ -1567,7 +1567,10 @@ function AudioGuideScreen({ onBack, selectedSite }: { onBack: () => void; select
         <div className="flex-1">
           <div className="flex items-center gap-1.5 mb-1">
             <h2 className="text-[#222E1C] font-black text-sm font-display">{selectedSite || "Heritage Site"}</h2>
-            <Badge label={apiKey ? "xAI Grok 2" : "Local AI"} color={apiKey ? "gold" : "sand"} />
+            <Badge
+              label={apiKey ? (apiKey.startsWith('AIza') ? "Gemini 2.0" : "xAI Grok") : "Local AI"}
+              color={apiKey ? "gold" : "sand"}
+            />
           </div>
           <p className="text-[#5F6B5E] text-xs font-medium leading-tight">
             {isListening ? "🎙️ Ara is listening..." : playing ? "🗣️ Ara is speaking..." : isThinking ? "🧠 Ara is thinking..." : "Ask Ara anything aloud or type below!"}
@@ -1681,7 +1684,7 @@ function AudioGuideScreen({ onBack, selectedSite }: { onBack: () => void; select
         </div>
       </div>
 
-      {/* Grok API Key Modal */}
+      {/* Gemini / Grok API Key Modal */}
       <AnimatePresence>
         {showKeyModal && (
           <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-5">
@@ -1694,17 +1697,17 @@ function AudioGuideScreen({ onBack, selectedSite }: { onBack: () => void; select
               <div className="flex justify-between items-center mb-4">
                 <div className="flex items-center gap-2">
                   <Key size={18} className="text-[#69A20D]" />
-                  <h3 className="text-[#222E1C] font-black text-base font-display">Configure Grok API Key</h3>
+                  <h3 className="text-[#222E1C] font-black text-base font-display">Configure AI API Key</h3>
                 </div>
                 <button onClick={() => setShowKeyModal(false)}><X size={18} className="text-[#5F6B5E]" /></button>
               </div>
               <p className="text-[#5F6B5E] text-xs leading-relaxed mb-4">
-                Enter your xAI Grok API Key (`xai-...`) to power Ara with real-time dynamic conversational intelligence.
+                Enter your <b>Google Gemini API Key</b> (`AIza...`) or <b>xAI Grok API Key</b> (`xai-...`) to power Ara with live conversational AI.
               </p>
               <div className="mb-4">
                 <input
                   type="password"
-                  placeholder="xai-..."
+                  placeholder="AIza... or xai-..."
                   value={keyInput}
                   onChange={e => setKeyInput(e.target.value)}
                   className="w-full bg-[#EEF1F3] border border-[#E4E7EB] rounded-2xl px-4 py-3 text-xs text-[#222E1C] outline-none focus:border-[#69A20D]"

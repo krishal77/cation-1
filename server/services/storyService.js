@@ -2,23 +2,14 @@ const axios = require('axios');
 const HeritageSite = require('../models/HeritageSite');
 
 /**
- * Generates an immersive cultural story for a recognized heritage site using Grok AI API.
- * Falls back gracefully to database or pre-curated catalog if Grok API key is missing or fails.
- * @param {string} siteName - Name of the heritage site
- * @param {string} [customPrompt] - Optional custom prompt or focus instructions from user
- * @returns {Promise<Object>} Cultural story narrative and metadata
+ * Generates an immersive cultural story for a recognized heritage site using Gemini or Grok AI API.
+ * Falls back gracefully to database or pre-curated catalog if API keys are missing or fail.
  */
-const generateCulturalStory = async (siteName, customPrompt = '') => {
-  const apiKey = process.env.GROK_API_KEY || process.env.XAI_API_KEY;
-  const modelsToTry = [process.env.GROK_MODEL, 'grok-beta', 'grok-2-1212', 'grok-2', 'grok-2-latest'].filter(Boolean);
+const generateCulturalStory = async (siteName, customPrompt = '', userApiKey = '') => {
+  const geminiKey = (userApiKey && userApiKey.startsWith('AIza')) ? userApiKey : (process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY);
+  const grokKey = (userApiKey && !userApiKey.startsWith('AIza')) ? userApiKey : (process.env.GROK_API_KEY || process.env.XAI_API_KEY);
 
-  // 1. Try xAI Grok API if key is configured
-  if (apiKey && apiKey !== 'your_grok_api_key_here') {
-    for (const modelName of modelsToTry) {
-      try {
-        console.log(`🤖 Requesting dynamic story from Grok API (${modelName}) for site: '${siteName}'...`);
-
-        const systemPrompt = `You are an expert cultural heritage historian, archaeologist, and audio guide storyteller.
+  const systemPrompt = `You are an expert cultural heritage historian, archaeologist, and audio guide storyteller.
 You specialize in world heritage sites, sacred monuments, and cultural traditions.
 Your task is to generate a captivating, accurate, and deeply immersive narrative for the specified heritage site.
 
@@ -30,10 +21,54 @@ Return strictly a single valid JSON object with no markdown code blocks surround
   "location": "District/Province/Country location string"
 }`;
 
-        let userContent = `Generate a cultural guide story for the site: "${siteName}".`;
-        if (customPrompt && customPrompt.trim().length > 0) {
-          userContent += `\nAdditional Custom Request / Focus: "${customPrompt.trim()}". Ensure the narrative heavily emphasizes this focus.`;
+  let userContent = `Generate a cultural guide story for the site: "${siteName}".`;
+  if (customPrompt && customPrompt.trim().length > 0) {
+    userContent += `\nAdditional Custom Request / Focus: "${customPrompt.trim()}". Ensure the narrative heavily emphasizes this focus.`;
+  }
+
+  // 1. Try Google Gemini API if Gemini Key is available
+  if (geminiKey && geminiKey !== 'your_gemini_api_key_here') {
+    const geminiModels = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-pro'];
+    for (const model of geminiModels) {
+      try {
+        console.log(`🤖 Requesting dynamic story from Gemini API (${model}) for site: '${siteName}'...`);
+        const geminiRes = await axios.post(
+          `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${geminiKey}`,
+          {
+            contents: [{ parts: [{ text: `${systemPrompt}\n\n${userContent}` }] }]
+          },
+          { headers: { 'Content-Type': 'application/json' }, timeout: 25000 }
+        );
+
+        const text = geminiRes.data.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (text) {
+          const jsonStr = text.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/\s*```$/i, '').trim();
+          const parsedData = JSON.parse(jsonStr);
+
+          return {
+            siteName,
+            title: parsedData.title || `Discovering ${siteName}`,
+            narrative: parsedData.narrative || '',
+            highlights: parsedData.highlights || [],
+            location: parsedData.location || 'Nepal',
+            source: 'Google Gemini API',
+            model,
+            customPromptUsed: customPrompt || null,
+            generatedAt: new Date(),
+          };
         }
+      } catch (geminiErr) {
+        console.warn(`⚠️ Gemini API (${model}) failed:`, geminiErr.response?.data?.error?.message || geminiErr.message);
+      }
+    }
+  }
+
+  // 2. Try xAI Grok API if Grok Key is available
+  if (grokKey && grokKey !== 'your_grok_api_key_here') {
+    const modelsToTry = [process.env.GROK_MODEL, 'grok-beta', 'grok-2-1212', 'grok-2', 'grok-2-latest'].filter(Boolean);
+    for (const modelName of modelsToTry) {
+      try {
+        console.log(`🤖 Requesting dynamic story from Grok API (${modelName}) for site: '${siteName}'...`);
 
         const grokResponse = await axios.post(
           'https://api.x.ai/v1/chat/completions',
@@ -48,42 +83,41 @@ Return strictly a single valid JSON object with no markdown code blocks surround
           {
             headers: {
               'Content-Type': 'application/json',
-              'Authorization': `Bearer ${apiKey}`,
+              'Authorization': `Bearer ${grokKey}`,
             },
             timeout: 25000,
           }
         );
 
-      const content = grokResponse.data.choices[0]?.message?.content;
-      if (content) {
-        // Strip markdown backticks if returned
-        const jsonStr = content.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/\s*```$/i, '').trim();
-        const parsedData = JSON.parse(jsonStr);
+        const content = grokResponse.data.choices[0]?.message?.content;
+        if (content) {
+          const jsonStr = content.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/\s*```$/i, '').trim();
+          const parsedData = JSON.parse(jsonStr);
 
-        return {
-          siteName,
-          title: parsedData.title || `Discovering ${siteName}`,
-          narrative: parsedData.narrative || '',
-          highlights: parsedData.highlights || [],
-          location: parsedData.location || 'Nepal',
-          source: 'xAI Grok API',
-          model: modelName,
-          customPromptUsed: customPrompt || null,
-          generatedAt: new Date(),
-        };
+          return {
+            siteName,
+            title: parsedData.title || `Discovering ${siteName}`,
+            narrative: parsedData.narrative || '',
+            highlights: parsedData.highlights || [],
+            location: parsedData.location || 'Nepal',
+            source: 'xAI Grok API',
+            model: modelName,
+            customPromptUsed: customPrompt || null,
+            generatedAt: new Date(),
+          };
+        }
+      } catch (grokError) {
+        console.warn('⚠️ Grok API call failed or timed out:', grokError.response?.data?.error || grokError.message);
       }
-    } catch (grokError) {
-      console.warn('⚠️ Grok API call failed or timed out. Trying next model if available:', grokError.response?.data?.error || grokError.message);
     }
   }
-}
 
-  // 2. Fallback to Database / Catalog
+  // 3. Fallback to Database / Catalog
   let siteDetails = null;
   try {
     siteDetails = await HeritageSite.findOne({ name: siteName });
   } catch (e) {
-    // If database unavailable, fallback to default narrative
+    // Fallback if DB unavailable
   }
 
   const defaultStories = {
@@ -134,11 +168,11 @@ Return strictly a single valid JSON object with no markdown code blocks surround
 };
 
 /**
- * Interactive human-like tour guide conversation with Ara powered by Grok AI API.
+ * Interactive human-like tour guide conversation with Ara powered by Gemini or Grok AI API.
  */
 const chatWithGuide = async (siteName, userMessage, history = [], userApiKey = '') => {
-  const apiKey = userApiKey || process.env.GROK_API_KEY || process.env.XAI_API_KEY;
-  const modelName = process.env.GROK_MODEL || 'grok-2-latest';
+  const geminiKey = (userApiKey && userApiKey.startsWith('AIza')) ? userApiKey : (process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY);
+  const grokKey = (userApiKey && !userApiKey.startsWith('AIza')) ? userApiKey : (process.env.GROK_API_KEY || process.env.XAI_API_KEY);
 
   const systemPrompt = `You are Ara, a warm, charismatic, human-like cultural heritage guide and storytelling companion.
 You are walking with the user at the heritage site: "${siteName || 'Cultural Heritage Site'}".
@@ -146,40 +180,81 @@ Speak conversationally, engagingly, and naturally, like a passionate local guide
 Keep responses concise (2-4 sentences max per turn) so it sounds natural when spoken aloud via voice synthesis.
 Be enthusiastic, respectful of local traditions, and ready to answer any questions about history, architecture, legends, or customs.`;
 
-  if (apiKey && apiKey !== 'your_grok_api_key_here') {
-    try {
-      const messages = [
-        { role: 'system', content: systemPrompt },
-        ...(Array.isArray(history) ? history.map(h => ({ role: h.sender === 'user' ? 'user' : 'assistant', content: h.text })) : []),
-        { role: 'user', content: userMessage }
-      ];
+  // 1. Try Google Gemini API first if Gemini Key is available
+  if (geminiKey && geminiKey !== 'your_gemini_api_key_here') {
+    const geminiModels = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-pro'];
+    for (const model of geminiModels) {
+      try {
+        console.log(`🤖 Ara chatting using Gemini API (${model})...`);
+        const geminiContents = [
+          ...(Array.isArray(history) ? history.map(h => ({
+            role: h.sender === 'user' ? 'user' : 'model',
+            parts: [{ text: h.text }]
+          })) : []),
+          { role: 'user', parts: [{ text: userMessage }] }
+        ];
 
-      const grokResponse = await axios.post(
-        'https://api.x.ai/v1/chat/completions',
-        {
-          model: modelName,
-          messages,
-          temperature: 0.7,
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${apiKey}`,
+        const geminiRes = await axios.post(
+          `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${geminiKey}`,
+          {
+            systemInstruction: { parts: [{ text: systemPrompt }] },
+            contents: geminiContents
           },
-          timeout: 25000,
-        }
-      );
+          { headers: { 'Content-Type': 'application/json' }, timeout: 25000 }
+        );
 
-      const reply = grokResponse.data.choices[0]?.message?.content;
-      if (reply) {
-        return {
-          reply: reply.trim(),
-          source: 'xAI Grok API',
-          model: modelName,
-        };
+        const reply = geminiRes.data.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (reply) {
+          return {
+            reply: reply.trim(),
+            source: 'Google Gemini API',
+            model,
+          };
+        }
+      } catch (geminiErr) {
+        console.warn(`⚠️ Gemini Chat (${model}) failed:`, geminiErr.response?.data?.error?.message || geminiErr.message);
       }
-    } catch (err) {
-      console.warn('⚠️ Grok chat API call failed:', err.response?.data?.error || err.message);
+    }
+  }
+
+  // 2. Try xAI Grok API if Grok Key is available
+  if (grokKey && grokKey !== 'your_grok_api_key_here') {
+    const modelsToTry = [process.env.GROK_MODEL, 'grok-beta', 'grok-2-1212', 'grok-2', 'grok-2-latest'].filter(Boolean);
+    for (const modelName of modelsToTry) {
+      try {
+        const messages = [
+          { role: 'system', content: systemPrompt },
+          ...(Array.isArray(history) ? history.map(h => ({ role: h.sender === 'user' ? 'user' : 'assistant', content: h.text })) : []),
+          { role: 'user', content: userMessage }
+        ];
+
+        const grokResponse = await axios.post(
+          'https://api.x.ai/v1/chat/completions',
+          {
+            model: modelName,
+            messages,
+            temperature: 0.7,
+          },
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${grokKey}`,
+            },
+            timeout: 25000,
+          }
+        );
+
+        const reply = grokResponse.data.choices[0]?.message?.content;
+        if (reply) {
+          return {
+            reply: reply.trim(),
+            source: 'xAI Grok API',
+            model: modelName,
+          };
+        }
+      } catch (err) {
+        console.warn('⚠️ Grok chat API call failed:', err.response?.data?.error || err.message);
+      }
     }
   }
 
@@ -198,7 +273,7 @@ Be enthusiastic, respectful of local traditions, and ready to answer any questio
 
   return {
     reply: fallbackReply,
-    source: 'Ara Interactive Guide (Provide Grok API key for live AI voice responses)',
+    source: 'Ara Interactive Guide (Provide Gemini or Grok API key for live AI voice responses)',
   };
 };
 
