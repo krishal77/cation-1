@@ -9,15 +9,15 @@ const generateCulturalStory = async (siteName, customPrompt = '', userApiKey = '
   const geminiKey = (userApiKey && userApiKey.startsWith('AIza')) ? userApiKey : (process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY);
   const grokKey = (userApiKey && !userApiKey.startsWith('AIza')) ? userApiKey : (process.env.GROK_API_KEY || process.env.XAI_API_KEY);
 
-  const systemPrompt = `You are an expert cultural heritage historian, archaeologist, and audio guide storyteller.
-You specialize in world heritage sites, sacred monuments, and cultural traditions.
-Your task is to generate a captivating, accurate, and deeply immersive narrative for the specified heritage site.
+  const systemPrompt = `You are an expert cultural heritage storyteller and charismatic guide.
+Your specialty is turning ancient heritage sites into fun, exciting, interactive, and unforgettable stories!
+Generate a captivating, fun-filled narrative for the specified heritage site with fascinating legends, secret myths, and fun trivia.
 
 Return strictly a single valid JSON object with no markdown code blocks surrounding it, matching this exact schema:
 {
-  "title": "A captivating, evocative title for the site story",
-  "narrative": "A rich 3-4 sentence storytelling paragraph describing historical context, legends, origins, and spiritual importance.",
-  "highlights": ["Key highlight 1", "Key highlight 2", "Key highlight 3"],
+  "title": "A fun, evocative title for the site story",
+  "narrative": "A rich 3-4 sentence fun storytelling paragraph featuring intriguing origins, legends, and exciting historical trivia.",
+  "highlights": ["Fun Highlight 1", "Fun Highlight 2", "Fun Highlight 3"],
   "location": "District/Province/Country location string"
 }`;
 
@@ -174,11 +174,11 @@ const chatWithGuide = async (siteName, userMessage, history = [], userApiKey = '
   const geminiKey = (userApiKey && userApiKey.startsWith('AIza')) ? userApiKey : (process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY);
   const grokKey = (userApiKey && !userApiKey.startsWith('AIza')) ? userApiKey : (process.env.GROK_API_KEY || process.env.XAI_API_KEY);
 
-  const systemPrompt = `You are Ara, a warm, charismatic, human-like cultural heritage guide and storytelling companion.
+  const systemPrompt = `You are Ara, a warm, charismatic, fun-loving cultural heritage guide and storytelling companion.
 You are walking with the user at the heritage site: "${siteName || 'Cultural Heritage Site'}".
-Speak conversationally, engagingly, and naturally, like a passionate local guide explaining history and answering questions.
+Speak conversationally, funnily, engagingly, and naturally, like an energetic local friend sharing secret legends, fun facts, and answering questions.
 Keep responses concise (2-4 sentences max per turn) so it sounds natural when spoken aloud via voice synthesis.
-Be enthusiastic, respectful of local traditions, and ready to answer any questions about history, architecture, legends, or customs.`;
+Be enthusiastic, fun, respectful of local traditions, and ready to share cool trivia and legends!`;
 
   // 1. Try Google Gemini API first if Gemini Key is available
   if (geminiKey && geminiKey !== 'your_gemini_api_key_here') {
