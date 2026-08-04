@@ -274,7 +274,7 @@ function GhostButton({ label, onClick, full = false }: { label: string; onClick?
 function SplashScreen({ onDone }: { onDone: () => void }) {
   useEffect(() => { const t = setTimeout(onDone, 3000); return () => clearTimeout(t); }, [onDone]);
   return (
-    <div className="h-full min-h-[852px] flex flex-col items-center justify-center relative overflow-hidden bg-[#F7F9F6]"
+    <div className="h-full min-h-full flex-1 flex flex-col items-center justify-center relative overflow-hidden bg-[#F7F9F6]"
       style={{ background: "linear-gradient(160deg, #23351F 0%, #354f2f 50%, #172514 100%)" }}>
       {/* Background mandala rings */}
       {[120, 200, 280, 360].map((r, i) => (
@@ -342,7 +342,7 @@ function OnboardingScreen({ onDone }: { onDone: () => void }) {
   const [step, setStep] = useState(0);
   const cur = ONBOARDING[step];
   return (
-    <div className="h-full min-h-[852px] flex flex-col bg-[#F7F9F6]">
+    <div className="h-full min-h-full flex-1 flex flex-col bg-[#F7F9F6]">
       <div className="relative flex-shrink-0">
         <div className="h-72 bg-[#EEF1F3] overflow-hidden">
           <AnimatePresence mode="wait">
@@ -404,7 +404,7 @@ function LoginScreen({ onDone, onRegister }: { onDone: () => void; onRegister: (
   const displayError = localError || error;
 
   return (
-    <div className="h-full min-h-[852px] flex flex-col bg-[#F7F9F6] px-6 pt-16">
+    <div className="h-full min-h-full flex-1 flex flex-col bg-[#F7F9F6] px-6 pt-16">
       <div className="flex flex-col items-center mb-8">
         <MascotSVG size={72} animate />
         <h1 className="text-3xl font-black text-[#222E1C] mt-4 font-display">Welcome Back</h1>
@@ -474,7 +474,7 @@ function RegisterScreen({ onDone, onBack }: { onDone: () => void; onBack: () => 
   const displayError = localError || error;
 
   return (
-    <div className="h-full min-h-[852px] flex flex-col bg-[#F7F9F6] px-6 pt-14">
+    <div className="h-full min-h-full flex-1 flex flex-col bg-[#F7F9F6] px-6 pt-14">
       <button onClick={onBack} className="w-9 h-9 rounded-full bg-[#EEF1F3] flex items-center justify-center mb-4 text-[#222E1C]">
         <ArrowLeft size={18} />
       </button>
@@ -572,7 +572,7 @@ function HomeScreen({ onNav, onScan, onSelectSite }: { onNav: (s: Screen) => voi
   ];
 
   return (
-    <div className="flex flex-col bg-[#F7F9F6] min-h-[852px]">
+    <div className="flex flex-col bg-[#F7F9F6] min-h-full flex-1">
       {/* Top Header */}
       <div className="px-5 pt-12 sm:pt-14 pb-4 bg-gradient-to-b from-[#EAF6DD]/60 via-[#F7F9F6]/40 to-transparent">
         <div className="flex items-center justify-between">
@@ -857,7 +857,7 @@ function CameraScreen({ onScan, onBack, onFileSelect }: { onScan: () => void; on
   };
 
   return (
-    <div className="h-full min-h-[852px] bg-black flex flex-col relative overflow-hidden">
+    <div className="h-full min-h-full flex-1 bg-black flex flex-col relative overflow-hidden">
       <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
       <canvas ref={canvasRef} className="hidden" />
 
@@ -991,7 +991,7 @@ function ScanningScreen({ onDone, imageFile, onRecognitionResult }: { onDone: ()
     return () => clearInterval(interval);
   }, [onDone, progress]);
   return (
-    <div className="h-full min-h-[852px] flex flex-col items-center justify-center relative overflow-hidden"
+    <div className="h-full min-h-full flex-1 flex flex-col items-center justify-center relative overflow-hidden"
       style={{ background: "linear-gradient(160deg, #23351F 0%, #354f2f 60%, #172514 100%)" }}>
       {[...Array(6)].map((_, i) => (
         <motion.div key={i} className="absolute rounded-full border border-[#69A20D]/20"
@@ -1046,7 +1046,7 @@ function ResultScreen({ onNav, onBack, recognitionResult, recognitionError, onSe
 
   if (recognitionError) {
     return (
-      <div className="flex flex-col bg-[#F7F9F6] min-h-[852px]">
+      <div className="flex flex-col bg-[#F7F9F6] min-h-full flex-1">
         <NavBar title="Recognition" onBack={onBack} />
         <div className="flex-1 flex flex-col items-center justify-center px-8 text-center">
           <div className="w-24 h-24 bg-red-50 rounded-full flex items-center justify-center mb-5 border border-red-200">
@@ -1061,7 +1061,7 @@ function ResultScreen({ onNav, onBack, recognitionResult, recognitionError, onSe
   }
 
   return (
-    <div className="flex flex-col bg-[#F7F9F6] min-h-[852px]">
+    <div className="flex flex-col bg-[#F7F9F6] min-h-full flex-1">
       {/* Hero */}
       <div className="relative h-64 bg-[#EEF1F3] flex-shrink-0">
         <img src={getSiteImage(siteName)}
@@ -1178,7 +1178,7 @@ function DetailsScreen({ onNav, onBack, selectedSite }: { onNav: (s: Screen) => 
   const displayTags = site?.tags || ["heritage", "cultural"];
 
   return (
-    <div className="flex flex-col bg-[#F7F9F6] min-h-[852px]">
+    <div className="flex flex-col bg-[#F7F9F6] min-h-full flex-1">
       <div className="relative h-56 bg-[#EEF1F3] flex-shrink-0">
         <img src={getSiteImage(displayName)}
           alt={displayName} className="w-full h-full object-cover" />
@@ -1267,7 +1267,7 @@ function StoryScreen({ onBack, selectedSite }: { onBack: () => void; selectedSit
   }, [selectedSite]);
 
   return (
-    <div className="flex flex-col bg-[#F7F9F6] min-h-[852px]">
+    <div className="flex flex-col bg-[#F7F9F6] min-h-full flex-1">
       <div className="px-5 pt-12 sm:pt-14 pb-3 flex items-center justify-between bg-white border-b border-[#E4E7EB]">
         <button onClick={onBack} className="w-9 h-9 rounded-full bg-[#EEF1F3] flex items-center justify-center text-[#222E1C]">
           <ArrowLeft size={18} />
@@ -1525,7 +1525,7 @@ function AudioGuideScreen({ onBack, selectedSite }: { onBack: () => void; select
   ];
 
   return (
-    <div className="flex flex-col bg-[#F7F9F6] min-h-[852px] relative">
+    <div className="flex flex-col bg-[#F7F9F6] min-h-full flex-1 relative">
       {/* Top Bar */}
       <div className="px-5 pt-12 sm:pt-14 pb-3 flex items-center justify-between bg-white border-b border-[#E4E7EB] z-10 shadow-xs">
         <div className="flex items-center gap-3">
@@ -1826,7 +1826,7 @@ function MapScreen({ onNav, onBack, onSelectSite }: { onNav: (s: Screen) => void
   const selectedPlace = heritagePlaces[selectedIdx];
 
   return (
-    <div className="flex flex-col bg-[#F7F9F6] min-h-[852px]">
+    <div className="flex flex-col bg-[#F7F9F6] min-h-full flex-1">
       <div className="px-5 pt-12 sm:pt-14 pb-3 flex items-center gap-3 bg-white border-b border-[#E4E7EB]">
         <button onClick={onBack} className="w-9 h-9 rounded-full bg-[#EEF1F3] flex items-center justify-center text-[#222E1C]">
           <ArrowLeft size={18} />
@@ -1915,7 +1915,7 @@ function ExploreScreen({ onNav, onSelectSite }: { onNav: (s: Screen) => void; on
         { name: "Pashupatinath Temple", loc: "Kathmandu, Nepal", img: SITE_IMAGES["Pashupatinath Temple"], r: 4.9 },
       ];
   return (
-    <div className="flex flex-col bg-[#F7F9F6] min-h-[852px]">
+    <div className="flex flex-col bg-[#F7F9F6] min-h-full flex-1">
       <div className="px-5 pt-12 sm:pt-14 pb-3">
         <h1 className="text-2xl font-black text-[#222E1C] mb-1 font-display">Explore Heritage</h1>
         <p className="text-[#5F6B5E] text-sm">Discover World Heritage sites and ancient legends</p>
@@ -1983,7 +1983,7 @@ function SearchScreen({ onBack, onSelectSite, onNav }: { onBack: () => void; onS
         .map(s => ({ name: s.name, loc: s.location, type: s.tags?.[0]?.replace(/_/g, ' ') || 'Heritage', img: getSiteImage(s.name) }))
     : [];
   return (
-    <div className="flex flex-col bg-[#F7F9F6] min-h-[852px]">
+    <div className="flex flex-col bg-[#F7F9F6] min-h-full flex-1">
       <div className="px-5 pt-12 sm:pt-14 pb-4">
         <div className="flex items-center gap-3 mb-5">
           <button onClick={onBack} className="w-9 h-9 rounded-full bg-[#EEF1F3] flex items-center justify-center text-[#222E1C]">
@@ -2064,7 +2064,7 @@ function SavedScreen({ onNav }: { onNav: (s: Screen) => void }) {
     { name: "Bindhyabasini Temple", loc: "Pokhara, Nepal", img: "https://images.unsplash.com/photo-1783682390495-b786c1939608?w=200&h=120&fit=crop", date: "Saved 2 weeks ago" },
   ];
   return (
-    <div className="flex flex-col bg-[#F7F9F6] min-h-[852px]">
+    <div className="flex flex-col bg-[#F7F9F6] min-h-full flex-1">
       <NavBar title="Saved Places" right={<button className="text-[#69A20D] text-xs font-bold">{saved.length} places</button>} />
       {saved.length === 0 ? (
         <div className="flex-1 flex flex-col items-center justify-center px-10 text-center">
@@ -2108,7 +2108,7 @@ function HistoryScreen({ onBack, onNav }: { onBack: () => void; onNav: (s: Scree
     { name: "Patan Durbar Square", loc: "Lalitpur, Nepal", date: "Jul 15, 2026", duration: "3h 30m", img: "https://images.unsplash.com/photo-1777846937163-3eeddb48829d?w=100&h=100&fit=crop" },
   ];
   return (
-    <div className="flex flex-col bg-[#F7F9F6] min-h-[852px]">
+    <div className="flex flex-col bg-[#F7F9F6] min-h-full flex-1">
       <NavBar title="Visit History" onBack={onBack} />
       <div className="px-5 mb-4 pt-2">
         <div className="grid grid-cols-3 gap-3">
@@ -2152,7 +2152,7 @@ function AchievementsScreen({ onBack }: { onBack: () => void }) {
     { name: "Desert Walker", icon: "🏜️", earned: false, date: null },
   ];
   return (
-    <div className="flex flex-col bg-[#F7F9F6] min-h-[852px]">
+    <div className="flex flex-col bg-[#F7F9F6] min-h-full flex-1">
       <NavBar title="Travel Passport" onBack={onBack} />
       {/* Passport cover */}
       <div className="mx-5 rounded-3xl p-5 mb-5 relative overflow-hidden shadow-lg"
@@ -2208,7 +2208,7 @@ function NotificationsScreen({ onBack }: { onBack: () => void }) {
     { title: "Weekly Heritage Digest", body: "Discover 5 hidden gems in Southeast Asia this week.", time: "Yesterday", icon: Bell, read: true },
   ];
   return (
-    <div className="flex flex-col bg-[#F7F9F6] min-h-[852px]">
+    <div className="flex flex-col bg-[#F7F9F6] min-h-full flex-1">
       <NavBar title="Notifications" onBack={onBack}
         right={<button className="text-[#69A20D] text-xs font-bold">Mark all read</button>} />
       <div className="px-5 flex flex-col gap-3 pt-2">
@@ -2238,7 +2238,7 @@ function ProfileScreen({ onNav }: { onNav: (s: Screen) => void }) {
   const initials = displayName.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
   const stats = [{ label: "Sites", val: "24" }, { label: "Stories", val: "18" }, { label: "Friends", val: "142" }];
   return (
-    <div className="flex flex-col bg-[#F7F9F6] min-h-[852px]">
+    <div className="flex flex-col bg-[#F7F9F6] min-h-full flex-1">
       <div className="px-5 pt-12 sm:pt-14 pb-5 flex items-center justify-between bg-white border-b border-[#E4E7EB]">
         <h1 className="text-xl font-black text-[#222E1C] font-display">Profile</h1>
         <button onClick={() => onNav("settings")} className="w-9 h-9 rounded-full bg-[#EEF1F3] flex items-center justify-center text-[#222E1C]">
@@ -2318,7 +2318,7 @@ function SettingsScreen({ onBack, onLogout }: { onBack: () => void; onLogout?: (
   };
 
   return (
-    <div className="flex flex-col bg-[#F7F9F6] min-h-[852px]">
+    <div className="flex flex-col bg-[#F7F9F6] min-h-full flex-1">
       <NavBar title="Settings" onBack={onBack} />
       <div className="px-5 flex flex-col gap-5 pt-2 pb-8">
         {sections.map(s => (
@@ -2367,7 +2367,7 @@ function LanguageScreen({ onBack }: { onBack: () => void }) {
     { name: "Arabic", native: "العربية", flag: "🇸🇦" },
   ];
   return (
-    <div className="flex flex-col bg-[#F7F9F6] min-h-[852px]">
+    <div className="flex flex-col bg-[#F7F9F6] min-h-full flex-1">
       <NavBar title="Language" onBack={onBack} />
       <div className="px-5 pt-2 pb-8">
         <div className="flex items-center gap-2 bg-[#EAF6DD] rounded-2xl p-3.5 mb-5 border border-[#CAE5B1]">
@@ -2399,7 +2399,7 @@ function OfflineScreen({ onBack }: { onBack: () => void }) {
     { name: "Peru & Machu Picchu", size: "76 MB", sites: 12, downloaded: false },
   ];
   return (
-    <div className="flex flex-col bg-[#F7F9F6] min-h-[852px]">
+    <div className="flex flex-col bg-[#F7F9F6] min-h-full flex-1">
       <NavBar title="Offline Mode" onBack={onBack} />
       <div className="px-5 pt-2 pb-8">
         <div className="flex items-center gap-3 bg-[#EAF6DD] rounded-2xl p-4 mb-5 border border-[#CAE5B1]">
@@ -2441,7 +2441,7 @@ function OfflineScreen({ onBack }: { onBack: () => void }) {
 
 function ErrorScreen({ onBack }: { onBack: () => void }) {
   return (
-    <div className="flex flex-col bg-[#F7F9F6] min-h-[852px]">
+    <div className="flex flex-col bg-[#F7F9F6] min-h-full flex-1">
       <NavBar onBack={onBack} />
       <div className="flex-1 flex flex-col items-center justify-center px-8 text-center">
         <div className="w-24 h-24 bg-red-50 rounded-full flex items-center justify-center mb-5 border border-red-200">
