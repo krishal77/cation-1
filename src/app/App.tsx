@@ -1383,15 +1383,59 @@ function AudioGuideScreen({ onBack, selectedSite }: { onBack: () => void; select
 
   // Handle SpeechSynthesis audio playback
   const speakText = useCallback((text: string, playbackRate: number) => {
-    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
+    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
+
+    window.speechSynthesis.cancel();
+
+    const doSpeak = () => {
       const utterance = new SpeechSynthesisUtterance(text);
-      utterance.rate = playbackRate;
-      utterance.pitch = 1.05;
+
+      // Cute, warm voice settings — higher pitch, gentle pace
+      utterance.rate = playbackRate * 0.88;  // slightly slower for warmth
+      utterance.pitch = 1.35;                // higher pitch = cuter voice
+      utterance.volume = 1.0;
 
       const voices = window.speechSynthesis.getVoices();
-      const preferredVoice = voices.find(v => v.lang.startsWith('en') && (v.name.includes('Natural') || v.name.includes('Google') || v.name.includes('Samantha') || v.name.includes('Karen')));
-      if (preferredVoice) utterance.voice = preferredVoice;
+
+      // Priority list: cute, young, warm female voices across platforms
+      const cutePriority = [
+        'Zira',           // Windows — young female
+        'Aria',           // Windows — natural, warm
+        'Samantha',       // macOS/iOS — classic cute
+        'Ava',            // macOS — newer natural voice
+        'Nicky',          // macOS
+        'Kate',           // macOS UK
+        'Fiona',          // macOS Scottish (charming)
+        'Monica',         // macOS Spanish (warm)
+        'Karen',          // macOS Australian
+        'Moira',          // macOS Irish
+        'Google UK English Female', // Chrome Android — very natural
+        'Google US English',        // Chrome fallback
+      ];
+
+      let chosenVoice: SpeechSynthesisVoice | undefined;
+
+      // Try priority list first
+      for (const name of cutePriority) {
+        chosenVoice = voices.find(v => v.name.includes(name) && v.lang.startsWith('en'));
+        if (chosenVoice) break;
+      }
+
+      // Fallback: any English female-sounding voice
+      if (!chosenVoice) {
+        chosenVoice = voices.find(v => v.lang.startsWith('en') && (
+          v.name.toLowerCase().includes('female') ||
+          v.name.toLowerCase().includes('girl') ||
+          v.name.toLowerCase().includes('woman')
+        ));
+      }
+
+      // Final fallback: first available English voice
+      if (!chosenVoice) {
+        chosenVoice = voices.find(v => v.lang.startsWith('en'));
+      }
+
+      if (chosenVoice) utterance.voice = chosenVoice;
 
       utterance.onend = () => {
         setPlaying(false);
@@ -1407,6 +1451,17 @@ function AudioGuideScreen({ onBack, selectedSite }: { onBack: () => void; select
 
       window.speechSynthesis.speak(utterance);
       setPlaying(true);
+    };
+
+    // Voices may not be loaded yet on mobile — wait for them
+    const voices = window.speechSynthesis.getVoices();
+    if (voices.length > 0) {
+      doSpeak();
+    } else {
+      window.speechSynthesis.onvoiceschanged = () => {
+        window.speechSynthesis.onvoiceschanged = null;
+        doSpeak();
+      };
     }
   }, []);
 
