@@ -60,3 +60,17 @@
     font-family: var(--font-display);
   }
 }
+
+/* Hide scrollbar completely for all horizontal & vertical containers */
+.scrollbar-hide::-webkit-scrollbar,
+::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+.scrollbar-hide,
+* {
+  -ms-overflow-style: none !important;  /* IE and Edge */
+  scrollbar-width: none !important;  /* Firefox */
+}
