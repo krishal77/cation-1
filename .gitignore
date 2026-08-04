@@ -19,6 +19,9 @@ __pycache__/
 # Environment & local secrets
 .env
 .env.local
+*.env
+server/.env
+.env.local
 .env.development.local
 
 # Operating System & IDE
