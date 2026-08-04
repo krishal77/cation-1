@@ -1725,158 +1725,288 @@ function MapScreen({ onNav, onBack, onSelectSite }: { onNav: (s: Screen) => void
   const mapInstanceRef = useRef<any>(null);
   const markersRef = useRef<any[]>([]);
 
-  const heritagePlaces = [
-    { name: "Patan Durbar Square", location: "Lalitpur, Nepal", lat: 27.6727, lng: 85.3253, rating: 4.8, dist: "1.2 km" },
-    { name: "Bindhyabasini Temple", location: "Pokhara, Nepal", lat: 28.2380, lng: 83.9856, rating: 4.9, dist: "Pokhara" },
-    { name: "Lumbini", location: "Rupandehi, Nepal", lat: 27.4840, lng: 83.2760, rating: 4.9, dist: "Lumbini" },
-    { name: "Pashupatinath Temple", location: "Kathmandu, Nepal", lat: 27.7104, lng: 85.3487, rating: 4.9, dist: "2.1 km" },
-    { name: "Boudhanath Stupa", location: "Kathmandu Valley", lat: 27.7215, lng: 85.3620, rating: 4.8, dist: "3.5 km" },
+  type PlaceCategory = 'Temple' | 'Buddhist' | 'UNESCO' | 'Palace' | 'Park';
+
+  const heritagePlaces: {
+    name: string; location: string; lat: number; lng: number;
+    rating: number; category: PlaceCategory; hours: string;
+    fee: string; bestTime: string; tips: number; mustSee: string;
+    emoji: string;
+  }[] = [
+    { name: "Patan Durbar Square", location: "Lalitpur, Nepal", lat: 27.6727, lng: 85.3253, rating: 4.8, category: "UNESCO", hours: "Open 24h", fee: "NPR 1,000", bestTime: "Morning", tips: 342, mustSee: "Krishna Mandir", emoji: "🏛️" },
+    { name: "Bindhyabasini Temple", location: "Pokhara, Nepal", lat: 28.2380, lng: 83.9856, rating: 4.9, category: "Temple", hours: "5am–9pm", fee: "Free", bestTime: "Sunrise", tips: 218, mustSee: "Hilltop View", emoji: "⛩️" },
+    { name: "Lumbini", location: "Rupandehi, Nepal", lat: 27.4840, lng: 83.2760, rating: 4.9, category: "Buddhist", hours: "Sunrise–Sunset", fee: "NPR 300", bestTime: "Early Morning", tips: 476, mustSee: "Maya Devi Temple", emoji: "☸️" },
+    { name: "Pashupatinath Temple", location: "Kathmandu, Nepal", lat: 27.7104, lng: 85.3487, rating: 4.9, category: "UNESCO", hours: "4am–9pm", fee: "NPR 1,000", bestTime: "Aarti 6pm", tips: 589, mustSee: "Evening Aarti", emoji: "🕉️" },
+    { name: "Boudhanath Stupa", location: "Kathmandu Valley", lat: 27.7215, lng: 85.3620, rating: 4.8, category: "Buddhist", hours: "Open 24h", fee: "NPR 400", bestTime: "Golden Hour", tips: 412, mustSee: "Kora Walk", emoji: "☮️" },
+    { name: "Swayambhunath", location: "Kathmandu, Nepal", lat: 27.7149, lng: 85.2904, rating: 4.7, category: "Buddhist", hours: "Open 24h", fee: "NPR 200", bestTime: "Sunrise", tips: 301, mustSee: "Monkey Temple", emoji: "🐒" },
+    { name: "Bhaktapur Durbar Square", location: "Bhaktapur, Nepal", lat: 27.6710, lng: 85.4298, rating: 4.8, category: "UNESCO", hours: "7am–7pm", fee: "NPR 1,500", bestTime: "Afternoon", tips: 267, mustSee: "55-Window Palace", emoji: "🏯" },
+    { name: "Changu Narayan Temple", location: "Bhaktapur, Nepal", lat: 27.7129, lng: 85.4228, rating: 4.6, category: "Temple", hours: "6am–7pm", fee: "NPR 300", bestTime: "Morning", tips: 143, mustSee: "Ancient Carvings", emoji: "🛕" },
+    { name: "Chitwan National Park", location: "Chitwan, Nepal", lat: 27.5291, lng: 84.3542, rating: 4.9, category: "Park", hours: "Dawn–Dusk", fee: "NPR 2,500", bestTime: "Early Morning", tips: 534, mustSee: "Rhino Safari", emoji: "🦏" },
   ];
+
+  const categories = ['All', 'Temple', 'Buddhist', 'UNESCO', 'Palace', 'Park'] as const;
+  type FilterCat = typeof categories[number];
 
   const [selectedIdx, setSelectedIdx] = useState(0);
   const [mapLoaded, setMapLoaded] = useState(false);
+  const [activeFilter, setActiveFilter] = useState<FilterCat>('All');
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [locating, setLocating] = useState(false);
+
+  const filteredPlaces = activeFilter === 'All'
+    ? heritagePlaces
+    : heritagePlaces.filter(p => p.category === activeFilter);
+
+  const categoryColors: Record<string, string> = {
+    Temple: '#B45309', Buddhist: '#6D28D9', UNESCO: '#069', Palace: '#92400E', Park: '#166534',
+  };
+  const categoryBg: Record<string, string> = {
+    Temple: '#FEF3C7', Buddhist: '#EDE9FE', UNESCO: '#DBEAFE', Palace: '#FEF3C7', Park: '#DCFCE7',
+  };
 
   useEffect(() => {
     let map: any = null;
-
     async function initLeafletMap() {
       if (!mapContainerRef.current) return;
-      if (mapInstanceRef.current) {
-        mapInstanceRef.current.remove();
-        mapInstanceRef.current = null;
-      }
-
-      // Import Leaflet dynamically
+      if (mapInstanceRef.current) { mapInstanceRef.current.remove(); mapInstanceRef.current = null; }
       const L = (await import('leaflet')).default;
       await import('leaflet/dist/leaflet.css');
 
-      map = L.map(mapContainerRef.current, {
-        zoomControl: false,
-        attributionControl: false,
-      }).setView([27.6727, 85.3253], 12);
+      map = L.map(mapContainerRef.current, { zoomControl: false, attributionControl: false })
+        .setView([27.7215, 85.3620], 10);
 
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-        maxZoom: 19,
-      }).addTo(map);
-
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { maxZoom: 19 }).addTo(map);
       L.control.zoom({ position: 'bottomright' }).addTo(map);
 
       markersRef.current = [];
       heritagePlaces.forEach((place, index) => {
+        const col = categoryColors[place.category] || '#23351F';
         const customIcon = L.divIcon({
-          className: 'custom-map-pin',
-          html: `<div style="background-color:#23351F; color:white; border:2px solid #69A20D; border-radius:50%; width:32px; height:32px; display:flex; items-center; justify-content:center; font-weight:bold; font-size:12px; box-shadow:0 4px 10px rgba(0,0,0,0.15);">${index + 1}</div>`,
-          iconSize: [32, 32],
-          iconAnchor: [16, 32],
+          className: '',
+          html: `<div style="background:${col};color:white;border:2.5px solid white;border-radius:50%;width:34px;height:34px;display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 3px 12px rgba(0,0,0,0.25);cursor:pointer;">${place.emoji}</div>`,
+          iconSize: [34, 34], iconAnchor: [17, 34],
         });
-
         const marker = L.marker([place.lat, place.lng], { icon: customIcon }).addTo(map);
+        marker.bindTooltip(`<b>${place.name}</b><br/>${place.fee} · ${place.hours}`, { direction: 'top', offset: [0, -36] });
         marker.on('click', () => {
-          setSelectedIdx(index);
-          map.flyTo([place.lat, place.lng], 14, { duration: 1 });
+          const realIdx = heritagePlaces.findIndex(p => p.name === place.name);
+          setSelectedIdx(realIdx);
+          map.flyTo([place.lat, place.lng], 15, { duration: 1.2 });
         });
         markersRef.current.push(marker);
       });
 
-      // Add User Geolocation Pulse if available
+      // User location
       if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (pos) => {
-            const userLat = pos.coords.latitude;
-            const userLng = pos.coords.longitude;
-            const userIcon = L.divIcon({
-              className: 'user-location-pin',
-              html: `<div style="width:16px; height:16px; background-color:#69A20D; border:3px solid white; border-radius:50%; box-shadow:0 0 10px rgba(105,162,13,0.8);"></div>`,
-              iconSize: [16, 16],
-            });
-            L.marker([userLat, userLng], { icon: userIcon }).addTo(map).bindPopup("You are here");
-          },
-          () => {},
-          { timeout: 5000 }
-        );
+        navigator.geolocation.getCurrentPosition((pos) => {
+          const { latitude: lat, longitude: lng } = pos.coords;
+          setUserLocation({ lat, lng });
+          const userIcon = L.divIcon({
+            className: '',
+            html: `<div style="width:18px;height:18px;background:#3B82F6;border:3px solid white;border-radius:50%;box-shadow:0 0 0 6px rgba(59,130,246,0.25);"></div>`,
+            iconSize: [18, 18], iconAnchor: [9, 9],
+          });
+          L.marker([lat, lng], { icon: userIcon }).addTo(map).bindTooltip('📍 You are here', { permanent: false });
+        }, () => {}, { timeout: 8000 });
       }
 
       mapInstanceRef.current = map;
       setMapLoaded(true);
     }
-
     initLeafletMap();
-
-    return () => {
-      if (mapInstanceRef.current) {
-        mapInstanceRef.current.remove();
-        mapInstanceRef.current = null;
-      }
-    };
+    return () => { if (mapInstanceRef.current) { mapInstanceRef.current.remove(); mapInstanceRef.current = null; } };
   }, []);
 
-  const handleSelectPlace = (index: number) => {
-    setSelectedIdx(index);
-    const place = heritagePlaces[index];
-    if (mapInstanceRef.current) {
-      mapInstanceRef.current.flyTo([place.lat, place.lng], 14, { duration: 1 });
-    }
+  const handleSelectPlace = (realIdx: number) => {
+    setSelectedIdx(realIdx);
+    const place = heritagePlaces[realIdx];
+    if (mapInstanceRef.current) mapInstanceRef.current.flyTo([place.lat, place.lng], 15, { duration: 1.2 });
+  };
+
+  const handleNearMe = () => {
+    if (!navigator.geolocation) return;
+    setLocating(true);
+    navigator.geolocation.getCurrentPosition((pos) => {
+      setLocating(false);
+      setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.flyTo([pos.coords.latitude, pos.coords.longitude], 13, { duration: 1.5 });
+      }
+    }, () => setLocating(false), { timeout: 8000 });
+  };
+
+  const handleDirections = (place: typeof heritagePlaces[0]) => {
+    const url = `https://www.google.com/maps/dir/?api=1&destination=${place.lat},${place.lng}&travelmode=driving`;
+    window.open(url, '_blank');
   };
 
   const selectedPlace = heritagePlaces[selectedIdx];
 
   return (
     <div className="flex flex-col bg-[#F7F9F6] min-h-full flex-1">
-      <div className="px-5 pt-12 sm:pt-14 pb-3 flex items-center gap-3 bg-white border-b border-[#E4E7EB]">
+      {/* Header */}
+      <div className="px-5 pt-12 sm:pt-14 pb-3 flex items-center gap-3 bg-white border-b border-[#E4E7EB] shadow-xs">
         <button onClick={onBack} className="w-9 h-9 rounded-full bg-[#EEF1F3] flex items-center justify-center text-[#222E1C]">
           <ArrowLeft size={18} />
         </button>
-        <span className="text-[#222E1C] text-base font-black flex-1 font-display">Interactive OpenStreetMap</span>
-        <button onClick={() => onNav("search")} className="w-9 h-9 rounded-full bg-[#EEF1F3] flex items-center justify-center text-[#222E1C]">
-          <Search size={16} />
+        <div className="flex-1">
+          <span className="text-[#222E1C] text-base font-black font-display block">Heritage Map</span>
+          <span className="text-[#5F6B5E] text-[10px] font-medium">{heritagePlaces.length} sites · Nepal</span>
+        </div>
+        <button onClick={handleNearMe} disabled={locating}
+          className="flex items-center gap-1.5 bg-[#EAF6DD] text-[#23351F] border border-[#CAE5B1] text-xs font-bold px-3 py-1.5 rounded-full">
+          {locating ? <Loader2 size={12} className="animate-spin" /> : <Navigation size={12} className="text-[#69A20D]" />}
+          <span>{locating ? 'Locating...' : 'Near Me'}</span>
         </button>
       </div>
 
-      {/* Real Map Container */}
-      <div className="mx-5 my-4 relative rounded-3xl overflow-hidden border border-[#E4E7EB] shadow-xs" style={{ height: 360 }}>
+      {/* Category Filter Tabs */}
+      <div className="flex gap-2 px-5 pt-3 pb-2 overflow-x-auto scrollbar-hide">
+        {categories.map(cat => (
+          <button key={cat} onClick={() => setActiveFilter(cat)}
+            className={`flex-shrink-0 text-xs font-bold px-3.5 py-1.5 rounded-full border transition-all ${
+              activeFilter === cat
+                ? 'bg-[#23351F] text-white border-[#23351F]'
+                : 'bg-white text-[#5F6B5E] border-[#E4E7EB] hover:border-[#69A20D]'
+            }`}>
+            {cat}
+          </button>
+        ))}
+      </div>
+
+      {/* Map */}
+      <div className="mx-5 mb-3 relative rounded-3xl overflow-hidden border border-[#E4E7EB] shadow-sm" style={{ height: 320 }}>
         <div ref={mapContainerRef} className="w-full h-full z-0" />
         {!mapLoaded && (
           <div className="absolute inset-0 bg-[#EEF1F3] flex items-center justify-center gap-2 text-sm text-[#23351F] font-bold">
             <Loader2 size={18} className="animate-spin text-[#69A20D]" />
-            <span>Loading OpenStreetMap...</span>
+            <span>Loading map...</span>
           </div>
         )}
+        {/* Map Legend */}
+        <div className="absolute bottom-3 left-3 bg-white/90 backdrop-blur-md rounded-2xl px-3 py-2 border border-white/60 shadow-sm">
+          <p className="text-[#222E1C] text-[9px] font-black mb-1">LEGEND</p>
+          {(['Temple','Buddhist','UNESCO','Park'] as PlaceCategory[]).map(cat => (
+            <div key={cat} className="flex items-center gap-1.5 mb-0.5">
+              <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: categoryColors[cat] }} />
+              <span className="text-[9px] text-[#5F6B5E] font-medium">{cat}</span>
+            </div>
+          ))}
+        </div>
       </div>
 
-      {/* Selected place card */}
-      <div className="px-5">
+      {/* Selected Place Tourist Card */}
+      <div className="px-5 mb-3">
         <motion.div key={selectedPlace.name} initial={{ y: 10, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
-          className="bg-white rounded-3xl p-4 border border-[#E4E7EB] shadow-xs flex items-center gap-3 mb-4">
-          <div className="w-14 h-14 rounded-2xl bg-[#EEF1F3] overflow-hidden flex-shrink-0">
-            <img src={getSiteImage(selectedPlace.name)} alt={selectedPlace.name} className="w-full h-full object-cover" />
-          </div>
-          <div className="flex-1">
-            <p className="text-[#222E1C] font-black text-sm">{selectedPlace.name}</p>
-            <div className="flex items-center gap-2 mt-0.5">
-              <div className="flex items-center gap-1"><Star size={10} className="text-[#69A20D] fill-[#69A20D]" /><span className="text-xs font-bold text-[#222E1C]">{selectedPlace.rating}</span></div>
-              <span className="text-[#A7B1A7] text-xs">·</span>
-              <span className="text-[#5F6B5E] text-xs font-medium">{selectedPlace.location}</span>
+          className="bg-white rounded-3xl border border-[#E4E7EB] shadow-sm overflow-hidden">
+          {/* Top section */}
+          <div className="flex items-start gap-3 p-4 pb-3">
+            <div className="w-16 h-16 rounded-2xl bg-[#EEF1F3] overflow-hidden flex-shrink-0">
+              <img src={getSiteImage(selectedPlace.name)} alt={selectedPlace.name} className="w-full h-full object-cover" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-1.5 mb-0.5 flex-wrap">
+                <p className="text-[#222E1C] font-black text-sm">{selectedPlace.name}</p>
+                <span className="text-xs px-2 py-0.5 rounded-full font-bold flex-shrink-0"
+                  style={{ color: categoryColors[selectedPlace.category], backgroundColor: categoryBg[selectedPlace.category] }}>
+                  {selectedPlace.category}
+                </span>
+              </div>
+              <div className="flex items-center gap-2 flex-wrap">
+                <div className="flex items-center gap-1">
+                  <Star size={10} className="text-amber-400 fill-amber-400" />
+                  <span className="text-xs font-bold text-[#222E1C]">{selectedPlace.rating}</span>
+                </div>
+                <span className="text-[#A7B1A7] text-xs">·</span>
+                <span className="text-[#5F6B5E] text-xs font-medium">{selectedPlace.tips} tips</span>
+                <span className="text-[#A7B1A7] text-xs">·</span>
+                <MapPin size={9} className="text-[#69A20D]" />
+                <span className="text-[#5F6B5E] text-[10px] font-medium truncate">{selectedPlace.location}</span>
+              </div>
             </div>
           </div>
-          <PrimaryButton label="Explore" onClick={() => { onSelectSite?.(selectedPlace.name); onNav("details"); }} icon={<Navigation size={14} />} />
-        </motion.div>
 
-        {/* List */}
-        <h3 className="text-[#222E1C] text-sm font-black mb-3 font-display">All Sites on Map ({heritagePlaces.length})</h3>
-        <div className="flex flex-col gap-2 pb-6">
-          {heritagePlaces.map((p, i) => (
-            <button key={p.name} onClick={() => handleSelectPlace(i)}
-              className={`flex items-center gap-3 rounded-2xl p-3 border transition-all text-left ${selectedIdx === i ? "bg-[#EAF6DD] border-[#CAE5B1]" : "bg-white border-[#E4E7EB]"}`}>
-              <div className="w-10 h-10 rounded-xl bg-[#EEF1F3] overflow-hidden flex-shrink-0">
-                <img src={getSiteImage(p.name)} alt="" className="w-full h-full object-cover" />
-              </div>
-              <div className="flex-1">
-                <p className={`text-sm font-bold ${selectedIdx === i ? "text-[#23351F]" : "text-[#222E1C]"}`}>{p.name}</p>
-                <p className="text-[#5F6B5E] text-xs">{p.location}</p>
-              </div>
-              <MapPin size={16} className={selectedIdx === i ? "text-[#69A20D]" : "text-[#5F6B5E]"} />
+          {/* Tourist Info Grid */}
+          <div className="grid grid-cols-3 gap-0 border-t border-[#F0F2F0] mx-4 mb-3">
+            <div className="flex flex-col items-center py-2.5 border-r border-[#F0F2F0]">
+              <Clock size={12} className="text-[#69A20D] mb-1" />
+              <p className="text-[10px] font-black text-[#222E1C]">{selectedPlace.hours}</p>
+              <p className="text-[9px] text-[#A7B1A7] font-medium">Hours</p>
+            </div>
+            <div className="flex flex-col items-center py-2.5 border-r border-[#F0F2F0]">
+              <span className="text-xs mb-1">🎟️</span>
+              <p className="text-[10px] font-black text-[#222E1C]">{selectedPlace.fee}</p>
+              <p className="text-[9px] text-[#A7B1A7] font-medium">Entry Fee</p>
+            </div>
+            <div className="flex flex-col items-center py-2.5">
+              <Sun size={12} className="text-amber-400 mb-1" />
+              <p className="text-[10px] font-black text-[#222E1C]">{selectedPlace.bestTime}</p>
+              <p className="text-[9px] text-[#A7B1A7] font-medium">Best Time</p>
+            </div>
+          </div>
+
+          {/* Must-See Tip */}
+          <div className="mx-4 mb-3 bg-[#EAF6DD] rounded-2xl px-3 py-2 flex items-center gap-2 border border-[#CAE5B1]">
+            <Star size={12} className="text-[#69A20D] flex-shrink-0" />
+            <p className="text-[10px] text-[#23351F] font-bold">Must-see: <span className="font-medium">{selectedPlace.mustSee}</span></p>
+          </div>
+
+          {/* Action buttons */}
+          <div className="flex gap-2 px-4 pb-4">
+            <button onClick={() => handleDirections(selectedPlace)}
+              className="flex-1 flex items-center justify-center gap-1.5 bg-[#23351F] text-white text-xs font-bold py-2.5 rounded-2xl">
+              <Navigation size={12} />
+              Get Directions
             </button>
-          ))}
+            <button onClick={() => { onSelectSite?.(selectedPlace.name); onNav("audio"); }}
+              className="flex-1 flex items-center justify-center gap-1.5 bg-[#EAF6DD] text-[#23351F] text-xs font-bold py-2.5 rounded-2xl border border-[#CAE5B1]">
+              <Volume2 size={12} className="text-[#69A20D]" />
+              Audio Guide
+            </button>
+            <button onClick={() => { onSelectSite?.(selectedPlace.name); onNav("details"); }}
+              className="w-10 flex items-center justify-center bg-[#EEF1F3] text-[#222E1C] rounded-2xl border border-[#E4E7EB]">
+              <Info size={14} />
+            </button>
+          </div>
+        </motion.div>
+      </div>
+
+      {/* Sites List */}
+      <div className="px-5 pb-6">
+        <h3 className="text-[#222E1C] text-sm font-black mb-3 font-display">
+          {activeFilter === 'All' ? 'All Sites' : activeFilter + ' Sites'} ({filteredPlaces.length})
+        </h3>
+        <div className="flex flex-col gap-2">
+          {filteredPlaces.map((p) => {
+            const realIdx = heritagePlaces.findIndex(h => h.name === p.name);
+            const isSelected = selectedIdx === realIdx;
+            return (
+              <button key={p.name} onClick={() => handleSelectPlace(realIdx)}
+                className={`flex items-center gap-3 rounded-2xl p-3 border transition-all text-left ${isSelected ? "bg-[#EAF6DD] border-[#CAE5B1]" : "bg-white border-[#E4E7EB]"}`}>
+                <div className="w-10 h-10 rounded-xl bg-[#EEF1F3] overflow-hidden flex-shrink-0">
+                  <img src={getSiteImage(p.name)} alt="" className="w-full h-full object-cover" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className={`text-sm font-bold truncate ${isSelected ? "text-[#23351F]" : "text-[#222E1C]"}`}>{p.name}</p>
+                  <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                    <span className="text-[9px] px-1.5 py-0.5 rounded-full font-bold"
+                      style={{ color: categoryColors[p.category], backgroundColor: categoryBg[p.category] }}>
+                      {p.emoji} {p.category}
+                    </span>
+                    <span className="text-[#5F6B5E] text-[9px] font-medium">{p.fee}</span>
+                    <span className="text-[#5F6B5E] text-[9px] font-medium">{p.hours}</span>
+                  </div>
+                </div>
+                <div className="flex flex-col items-end gap-1 flex-shrink-0">
+                  <div className="flex items-center gap-1">
+                    <Star size={9} className="text-amber-400 fill-amber-400" />
+                    <span className="text-[10px] font-bold text-[#222E1C]">{p.rating}</span>
+                  </div>
+                  <MapPin size={13} className={isSelected ? "text-[#69A20D]" : "text-[#A7B1A7]"} />
+                </div>
+              </button>
+            );
+          })}
         </div>
       </div>
     </div>
