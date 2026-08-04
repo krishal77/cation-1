@@ -1,0 +1,20 @@
+{
+  "Bindhyabasini Temple": {
+    "name": "Bindhyabasini Temple",
+    "location": "Pokhara, Kaski, Nepal",
+    "description": "Bindhyabasini Temple is one of the oldest temples in Pokhara, dedicated to Goddess Bhagawati (Durga). Located on a hillock, it offers views of the Annapurna range.",
+    "tags": ["temple", "pokhara", "hindu", "cultural_heritage"]
+  },
+  "Lumbini": {
+    "name": "Lumbini",
+    "location": "Rupandehi District, Lumbini Province, Nepal",
+    "description": "Lumbini is a UNESCO World Heritage Site and the sacred birthplace of Lord Gautama Buddha, featuring the Maya Devi Temple and Ashoka Pillar.",
+    "tags": ["buddhist", "unesco", "monument", "pilgrimage"]
+  },
+  "Patan Durbar Square": {
+    "name": "Patan Durbar Square",
+    "location": "Lalitpur, Kathmandu Valley, Nepal",
+    "description": "Patan Durbar Square is a UNESCO World Heritage site known for its marvelous Malla-era architecture, metal statues, Krishna Mandir, and fine arts.",
+    "tags": ["durbar_square", "lalitpur", "unesco", "malla_architecture"]
+  }
+}

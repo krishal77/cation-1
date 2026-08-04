@@ -7,7 +7,7 @@ import {
   Trophy, Compass, Home, BookOpen, MoreHorizontal, X, Check,
   Filter, Share2, Download, Eye, Navigation, Zap, Moon, Sun,
   ChevronDown, Plus, Minus, RotateCcw, Info, Award, Map,
-  Languages, HardDrive, AlertTriangle, Coffee, Wind, Loader2
+  Languages, HardDrive, AlertTriangle, Coffee, Wind, Loader2, Sparkles
 } from "lucide-react";
 import { useAuth } from "./context/AuthContext";
 import {
@@ -89,16 +89,17 @@ function MascotSVG({ size = 80, animate = false }: { size?: number; animate?: bo
 // ── Shared UI Components ───────────────────────────────────────────────────
 function PhoneFrame({ children }: { children: React.ReactNode }) {
   return (
-    <div className="relative w-full h-full min-h-screen sm:min-h-0 sm:w-[393px] sm:h-[852px] bg-[#FFFDF8] overflow-hidden sm:rounded-[52px] sm:shadow-2xl sm:border sm:border-[#2C3E8F]/10 flex-shrink-0">
-      {/* Status bar (desktop preview only) */}
-      <div className="hidden sm:flex absolute top-0 left-0 right-0 h-14 z-50 items-end px-8 pb-2">
-        <div className="flex-1 text-[11px] font-semibold text-[#222831]">9:41</div>
-        <div className="w-28 h-7 bg-black rounded-full absolute left-1/2 -translate-x-1/2 top-2" />
-        <div className="flex gap-1 items-center">
-          <div className="w-4 h-3 border border-[#222831] rounded-[2px] relative"><div className="absolute inset-[1px] right-[2px] bg-[#222831] rounded-[1px]" /></div>
+    <div className="relative w-full h-full min-h-screen sm:min-h-[840px] sm:h-[852px] sm:max-w-md md:max-w-lg lg:max-w-xl bg-[#FFFDF8] overflow-hidden sm:rounded-[40px] sm:shadow-2xl sm:border sm:border-[#2C3E8F]/15 flex-shrink-0 transition-all duration-300">
+      {/* Simulated status bar (visible on desktop frame) */}
+      <div className="hidden sm:flex absolute top-0 left-0 right-0 h-12 z-50 items-center justify-between px-8 text-[#222831]">
+        <span className="text-[11px] font-bold tracking-tight">9:41</span>
+        <div className="w-24 h-5 bg-black/90 rounded-full absolute left-1/2 -translate-x-1/2 top-1" />
+        <div className="flex gap-1.5 items-center text-[10px]">
+          <span className="font-bold">5G</span>
+          <div className="w-4 h-2.5 border border-[#222831] rounded-[2px] relative"><div className="absolute inset-[1px] right-[2px] bg-[#222831] rounded-[1px]" /></div>
         </div>
       </div>
-      <div className="absolute inset-0 overflow-y-auto overflow-x-hidden scrollbar-hide">
+      <div className="absolute inset-0 overflow-y-auto overflow-x-hidden scrollbar-hide flex flex-col">
         {children}
       </div>
     </div>
@@ -107,13 +108,13 @@ function PhoneFrame({ children }: { children: React.ReactNode }) {
 
 function NavBar({ title, onBack, right }: { title?: string; onBack?: () => void; right?: React.ReactNode }) {
   return (
-    <div className="sticky top-0 z-40 bg-[#FFFDF8]/90 backdrop-blur-md px-5 pt-16 pb-3 flex items-center gap-3">
+    <div className="sticky top-0 z-40 bg-[#FFFDF8]/95 backdrop-blur-md px-5 pt-12 sm:pt-14 pb-3.5 flex items-center gap-3 border-b border-[#2C3E8F]/6 shadow-xs">
       {onBack && (
-        <button onClick={onBack} className="w-9 h-9 rounded-full bg-[#F6F0E7] flex items-center justify-center flex-shrink-0">
+        <motion.button whileTap={{ scale: 0.9 }} onClick={onBack} className="w-9 h-9 rounded-full bg-[#F6F0E7] flex items-center justify-center flex-shrink-0 hover:bg-[#2C3E8F]/10 transition-colors">
           <ArrowLeft size={18} className="text-[#222831]" />
-        </button>
+        </motion.button>
       )}
-      {title && <h1 className="flex-1 text-lg font-bold text-[#222831] font-display">{title}</h1>}
+      {title && <h1 className="flex-1 text-lg font-black text-[#222831] font-display truncate">{title}</h1>}
       {right && <div className="flex-shrink-0">{right}</div>}
     </div>
   );
@@ -128,15 +129,15 @@ function BottomNav({ active, onNav }: { active: string; onNav: (s: Screen) => vo
     { id: "profile", icon: User, label: "Profile" },
   ] as const;
   return (
-    <div className="sticky bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-[#2C3E8F]/10 px-2 pt-2 pb-6 z-40">
-      <div className="flex justify-around">
+    <div className="sticky bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-[#2C3E8F]/10 px-3 pt-2.5 pb-6 z-40 shadow-lg">
+      <div className="flex justify-around items-center max-w-lg mx-auto">
         {items.map(({ id, icon: Icon, label }) => (
-          <button key={id} onClick={() => onNav(id as Screen)} className="flex flex-col items-center gap-0.5 px-3 py-1 relative">
+          <button key={id} onClick={() => onNav(id as Screen)} className="flex flex-col items-center gap-1 px-3 py-1 relative group">
             {active === id && (
-              <motion.div layoutId="navpill" className="absolute inset-0 bg-[#2C3E8F]/8 rounded-2xl" />
+              <motion.div layoutId="navpill" className="absolute inset-0 bg-[#2C3E8F]/10 rounded-2xl" transition={{ type: "spring", stiffness: 400, damping: 30 }} />
             )}
-            <Icon size={22} className={active === id ? "text-[#2C3E8F]" : "text-[#6B7280]"} />
-            <span className={`text-[10px] font-semibold ${active === id ? "text-[#2C3E8F]" : "text-[#6B7280]"}`}>{label}</span>
+            <Icon size={22} className={`transition-colors ${active === id ? "text-[#2C3E8F]" : "text-[#6B7280] group-hover:text-[#222831]"}`} />
+            <span className={`text-[10px] font-bold transition-colors ${active === id ? "text-[#2C3E8F]" : "text-[#6B7280] group-hover:text-[#222831]"}`}>{label}</span>
           </button>
         ))}
       </div>
@@ -506,7 +507,6 @@ function RegisterScreen({ onDone, onBack }: { onDone: () => void; onBack: () => 
     </div>
   );
 }
-
 // Heritage site images for display (since the API doesn't store image URLs yet)
 const SITE_IMAGES: Record<string, string> = {
   "Bindhyabasini Temple": "https://images.unsplash.com/photo-1761048800438-730332b87f7a?w=400&h=250&fit=crop",
@@ -522,10 +522,11 @@ function getSiteImage(name: string): string {
 
 function HomeScreen({ onNav, onScan, onSelectSite }: { onNav: (s: Screen) => void; onScan: () => void; onSelectSite: (name: string) => void }) {
   const { user } = useAuth();
-  const [activeChip, setActiveChip] = useState("All");
-  const chips = ["All", "Temples", "Ruins", "Palaces", "Museums", "Natural"];
   const [sites, setSites] = useState<HeritageSite[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeChip, setActiveChip] = useState("All");
+
+  const chips = ["All", "UNESCO", "Temples", "Buddhist", "Palaces", "Monuments"];
 
   useEffect(() => {
     getHeritageSites()
@@ -546,93 +547,211 @@ function HomeScreen({ onNav, onScan, onSelectSite }: { onNav: (s: Screen) => voi
         { name: "Lumbini", location: "Rupandehi, Nepal", img: SITE_IMAGES["Lumbini"], rating: 4.8 },
         { name: "Patan Durbar Square", location: "Lalitpur, Nepal", img: SITE_IMAGES["Patan Durbar Square"], rating: 4.7 },
       ];
+
   const recent = [
-    { name: "Roman Colosseum", img: "https://images.unsplash.com/photo-1760095888026-df3eeee6f302?w=100&h=100&fit=crop", time: "2h ago" },
-    { name: "Machu Picchu", img: "https://images.unsplash.com/photo-1777846937163-3eeddb48829d?w=100&h=100&fit=crop", time: "Yesterday" },
+    { name: "Bindhyabasini Temple", location: "Pokhara, Kaski", img: getSiteImage("Bindhyabasini Temple"), time: "2h ago" },
+    { name: "Patan Durbar Square", location: "Lalitpur, Nepal", img: getSiteImage("Patan Durbar Square"), time: "Yesterday" },
   ];
+
   const displayName = user?.name || "Explorer";
+  const userInitials = displayName.split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2) || "EX";
+
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return "Good Morning,";
+    if (hour < 18) return "Good Afternoon,";
+    return "Good Evening,";
+  };
+
+  const quickActions = [
+    { label: "AI Scan", icon: Camera, color: "bg-[#2C3E8F]", textColor: "text-white", action: onScan },
+    { label: "Audio Guide", icon: Volume2, color: "bg-[#D4A017]/15", textColor: "text-[#D4A017]", action: () => onNav("audio") },
+    { label: "Story Mode", icon: BookOpen, color: "bg-[#2E8B57]/15", textColor: "text-[#2E8B57]", action: () => onNav("story") },
+    { label: "Map View", icon: MapPin, color: "bg-[#2C3E8F]/10", textColor: "text-[#2C3E8F]", action: () => onNav("map") },
+  ];
+
   return (
     <div className="flex flex-col bg-[#FFFDF8] min-h-[852px]">
-      {/* Header */}
-      <div className="px-5 pt-16 pb-4" style={{ background: "linear-gradient(180deg, #2C3E8F08 0%, transparent 100%)" }}>
-        <div className="flex items-center justify-between mb-1">
+      {/* Top Header */}
+      <div className="px-5 pt-12 sm:pt-14 pb-4" style={{ background: "linear-gradient(180deg, rgba(44,62,143,0.06) 0%, transparent 100%)" }}>
+        <div className="flex items-center justify-between">
           <div>
-            <p className="text-[#6B7280] text-xs font-medium">Good Morning,</p>
-            <h1 className="text-xl font-black text-[#222831]">{displayName} ✨</h1>
+            <p className="text-[#6B7280] text-xs font-semibold">{getGreeting()}</p>
+            <h1 className="text-xl font-black text-[#222831] flex items-center gap-1.5">
+              {displayName}
+              <span className="inline-block w-2 h-2 rounded-full bg-[#2E8B57]" />
+            </h1>
           </div>
-          <div className="flex gap-2">
-            <button onClick={() => onNav("notifications")} className="w-10 h-10 rounded-full bg-white border border-[#2C3E8F]/10 flex items-center justify-center relative">
+          <div className="flex items-center gap-2.5">
+            <button
+              onClick={() => onNav("notifications")}
+              className="w-10 h-10 rounded-2xl bg-white border border-[#2C3E8F]/10 flex items-center justify-center relative shadow-xs hover:bg-[#F6F0E7] transition-all"
+            >
               <Bell size={18} className="text-[#222831]" />
-              <div className="absolute top-2 right-2 w-2 h-2 bg-[#D4A017] rounded-full" />
+              <div className="absolute top-2.5 right-2.5 w-2 h-2 bg-[#D4A017] rounded-full border-2 border-white" />
             </button>
-            <button onClick={() => onNav("profile")} className="w-10 h-10 rounded-full bg-[#2C3E8F] flex items-center justify-center">
-              <span className="text-white text-sm font-bold">PS</span>
+            <button
+              onClick={() => onNav("profile")}
+              className="w-10 h-10 rounded-2xl bg-[#2C3E8F] flex items-center justify-center shadow-md hover:bg-[#1a2a6c] transition-all"
+            >
+              <span className="text-white text-xs font-black tracking-wider">{userInitials}</span>
             </button>
           </div>
         </div>
       </div>
-      {/* Search */}
+
+      {/* Search Input Bar */}
       <div className="px-5 mb-5">
-        <button onClick={() => onNav("search")} className="w-full flex items-center gap-3 bg-white border border-[#2C3E8F]/12 rounded-2xl px-4 py-3.5 shadow-sm">
+        <button onClick={() => onNav("search")} className="w-full flex items-center gap-3 bg-white border border-[#2C3E8F]/12 rounded-2xl px-4 py-3.5 shadow-sm hover:border-[#2C3E8F]/30 transition-all text-left">
           <Search size={18} className="text-[#6B7280]" />
-          <span className="text-[#6B7280] text-sm">Search heritage sites, stories...</span>
-          <div className="ml-auto bg-[#2C3E8F]/8 rounded-lg p-1.5"><Filter size={14} className="text-[#2C3E8F]" /></div>
+          <span className="text-[#6B7280] text-sm flex-1 font-medium">Search heritage sites, temples, history...</span>
+          <div className="bg-[#2C3E8F]/8 rounded-xl p-1.5">
+            <Filter size={14} className="text-[#2C3E8F]" />
+          </div>
         </button>
       </div>
-      {/* AI Scan CTA */}
+
+      {/* AI Camera Scanner Hero Card */}
       <div className="px-5 mb-6">
-        <motion.button whileTap={{ scale: 0.97 }} onClick={onScan}
-          className="w-full rounded-3xl overflow-hidden relative h-28 flex items-center"
-          style={{ background: "linear-gradient(135deg, #2C3E8F 0%, #1a2a6c 100%)" }}>
-          <div className="flex-1 px-5">
-            <p className="text-[#D4A017] text-xs font-bold mb-1">AI POWERED</p>
-            <h3 className="text-white text-lg font-black leading-tight">Scan a Heritage Site</h3>
-            <p className="text-white/60 text-xs mt-0.5">Point & discover instantly</p>
+        <motion.div
+          whileTap={{ scale: 0.98 }}
+          onClick={onScan}
+          className="w-full rounded-3xl p-5 relative overflow-hidden shadow-xl cursor-pointer"
+          style={{ background: "linear-gradient(135deg, #1a2a6c 0%, #2C3E8F 50%, #0d1b4a 100%)" }}
+        >
+          {/* Subtle Grid pattern overlay */}
+          <div className="absolute inset-0 bg-[radial-gradient(#D4A017_1px,transparent_1px)] [background-size:16px_16px] opacity-10 pointer-events-none" />
+
+          <div className="relative z-10 flex items-center justify-between">
+            <div className="flex-1 pr-3">
+              <div className="inline-flex items-center gap-1.5 bg-[#D4A017]/20 border border-[#D4A017]/40 rounded-full px-2.5 py-0.5 mb-2">
+                <Sparkles size={10} className="text-[#D4A017]" />
+                <span className="text-[#D4A017] text-[10px] font-bold tracking-wider uppercase">OpenCLIP AI Powered</span>
+              </div>
+              <h3 className="text-white text-lg font-black leading-tight">Identify Heritage Site</h3>
+              <p className="text-white/70 text-xs mt-1">Point your camera or upload a photo for instant history & audio guide</p>
+            </div>
+
+            <div className="relative flex-shrink-0 flex items-center justify-center">
+              <div className="absolute inset-0 bg-[#D4A017]/25 blur-xl rounded-full" />
+              <MascotSVG size={64} animate />
+            </div>
           </div>
-          <div className="relative mr-4">
-            <div className="absolute inset-0 bg-[#D4A017]/20 blur-xl rounded-full" />
-            <MascotSVG size={72} animate />
+
+          <div className="mt-4 pt-3 border-t border-white/10 flex items-center justify-between relative z-10">
+            <span className="text-white/80 text-xs font-semibold flex items-center gap-1">
+              <Camera size={14} className="text-[#D4A017]" /> Open Live Scanner
+            </span>
+            <div className="w-8 h-8 rounded-full bg-[#D4A017] text-white flex items-center justify-center shadow-md">
+              <ChevronRight size={16} />
+            </div>
           </div>
-          <div className="absolute right-4 bottom-4 w-10 h-10 rounded-full bg-[#D4A017] flex items-center justify-center shadow-lg">
-            <Camera size={20} className="text-white" />
-          </div>
-        </motion.button>
+        </motion.div>
       </div>
-      {/* Categories */}
+
+      {/* Quick Access Actions Bar */}
+      <div className="px-5 mb-6">
+        <div className="grid grid-cols-4 gap-2.5">
+          {quickActions.map(act => (
+            <motion.button
+              key={act.label}
+              whileTap={{ scale: 0.95 }}
+              onClick={act.action}
+              className="flex flex-col items-center gap-1.5 p-3 rounded-2xl bg-white border border-[#2C3E8F]/8 shadow-xs hover:shadow-md transition-all text-center"
+            >
+              <div className={`w-11 h-11 rounded-2xl ${act.color} flex items-center justify-center shadow-xs`}>
+                <act.icon size={20} className={act.textColor} />
+              </div>
+              <span className="text-[#222831] text-[11px] font-bold leading-tight">{act.label}</span>
+            </motion.button>
+          ))}
+        </div>
+      </div>
+
+      {/* Heritage Categories */}
       <div className="mb-5">
         <div className="px-5 mb-3 flex items-center justify-between">
           <h2 className="text-base font-black text-[#222831]">Categories</h2>
         </div>
         <div className="flex gap-2 px-5 overflow-x-auto scrollbar-hide">
-          {chips.map(c => <Chip key={c} label={c} active={activeChip === c} onClick={() => setActiveChip(c)} />)}
+          {chips.map(c => (
+            <Chip key={c} label={c} active={activeChip === c} onClick={() => setActiveChip(c)} />
+          ))}
         </div>
       </div>
-      {/* Featured */}
-      <div className="mb-5">
+
+      {/* Featured Heritage Sites */}
+      <div className="mb-6">
         <div className="px-5 mb-3 flex items-center justify-between">
-          <h2 className="text-base font-black text-[#222831]">Featured Sites</h2>
-          <button onClick={() => onNav("explore")} className="text-[#2C3E8F] text-xs font-bold flex items-center gap-1">See all <ChevronRight size={12} /></button>
+          <div>
+            <h2 className="text-base font-black text-[#222831]">Featured Heritage</h2>
+            <p className="text-[#6B7280] text-xs">Explore top sacred destinations</p>
+          </div>
+          <button onClick={() => onNav("explore")} className="text-[#2C3E8F] text-xs font-bold flex items-center gap-1 hover:underline">
+            See all <ChevronRight size={12} />
+          </button>
         </div>
-        <div className="flex gap-3 px-5 overflow-x-auto scrollbar-hide">
-          {loading ? [1,2,3].map(i => <SkeletonCard key={i} />) : featured.map(f => <HeritageCard key={f.name} {...f} onClick={() => { onSelectSite(f.name); onNav("details"); }} />)}
+        <div className="flex gap-3.5 px-5 overflow-x-auto scrollbar-hide py-1">
+          {loading
+            ? [1, 2, 3].map(i => <SkeletonCard key={i} />)
+            : featured.map(f => (
+                <HeritageCard
+                  key={f.name}
+                  {...f}
+                  onClick={() => {
+                    onSelectSite(f.name);
+                    onNav("details");
+                  }}
+                />
+              ))}
         </div>
       </div>
-      {/* Recent visits */}
-      <div className="px-5 mb-5">
-        <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-base font-black text-[#222831]">Recent Visits</h2>
-          <button onClick={() => onNav("history")} className="text-[#2C3E8F] text-xs font-bold">See all</button>
+
+      {/* Daily Cultural Discovery Highlight Card */}
+      <div className="px-5 mb-6">
+        <div className="bg-gradient-to-r from-[#2C3E8F]/8 to-[#D4A017]/10 border border-[#2C3E8F]/15 rounded-3xl p-4 flex items-center gap-3">
+          <div className="w-12 h-12 rounded-2xl bg-[#2C3E8F] text-white flex items-center justify-center flex-shrink-0 shadow-md">
+            <Compass size={22} className="text-[#D4A017]" />
+          </div>
+          <div className="flex-1">
+            <Badge label="Daily Discovery" color="gold" />
+            <h4 className="text-[#222831] text-xs font-black mt-1">Valley of Gods & Temples</h4>
+            <p className="text-[#6B7280] text-[11px] mt-0.5 line-clamp-1">Did you know Kathmandu has 7 UNESCO World Heritage sites?</p>
+          </div>
+          <button onClick={() => onNav("explore")} className="text-[#2C3E8F] text-xs font-bold underline">
+            Read
+          </button>
         </div>
-        <div className="flex flex-col gap-3">
+      </div>
+
+      {/* Recent Visits History */}
+      <div className="px-5 mb-6">
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="text-base font-black text-[#222831]">Recent Scans & Visits</h2>
+          <button onClick={() => onNav("history")} className="text-[#2C3E8F] text-xs font-bold hover:underline">
+            View history
+          </button>
+        </div>
+        <div className="flex flex-col gap-2.5">
           {recent.map(r => (
-            <button key={r.name} onClick={() => onNav("details")}
-              className="flex items-center gap-3 bg-white rounded-2xl p-3 border border-[#2C3E8F]/8 shadow-sm">
+            <button
+              key={r.name}
+              onClick={() => {
+                onSelectSite(r.name);
+                onNav("details");
+              }}
+              className="flex items-center gap-3 bg-white rounded-2xl p-3 border border-[#2C3E8F]/8 shadow-xs hover:shadow-md transition-all text-left"
+            >
               <img src={r.img} alt={r.name} className="w-12 h-12 rounded-xl object-cover" />
-              <div className="flex-1 text-left">
+              <div className="flex-1">
                 <p className="text-[#222831] text-sm font-bold">{r.name}</p>
-                <div className="flex items-center gap-1 mt-0.5">
-                  <Clock size={10} className="text-[#6B7280]" />
-                  <span className="text-[#6B7280] text-xs">{r.time}</span>
+                <div className="flex items-center gap-2 mt-0.5">
+                  <span className="text-[#6B7280] text-xs">{r.location}</span>
+                  <span className="text-[#6B7280] text-xs">·</span>
+                  <div className="flex items-center gap-1">
+                    <Clock size={10} className="text-[#6B7280]" />
+                    <span className="text-[#6B7280] text-[11px]">{r.time}</span>
+                  </div>
                 </div>
               </div>
               <ChevronRight size={16} className="text-[#6B7280]" />
@@ -971,11 +1090,23 @@ function ResultScreen({ onNav, onBack, recognitionResult, recognitionError, onSe
           <MapPin size={12} className="text-[#6B7280]" />
           <span className="text-[#6B7280] text-sm">{location}</span>
         </div>
-        {/* AI summary */}
+        {/* AI summary with Audio Narration */}
         <div className="bg-[#2C3E8F]/6 rounded-3xl p-4 mb-5 border border-[#2C3E8F]/12">
-          <div className="flex items-center gap-2 mb-2">
-            <MascotSVG size={28} />
-            <span className="text-[#2C3E8F] text-xs font-bold">Ara says</span>
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <MascotSVG size={28} />
+              <span className="text-[#2C3E8F] text-xs font-bold">Ara says</span>
+            </div>
+            <button
+              onClick={() => {
+                onSelectSite(siteName);
+                onNav("audio");
+              }}
+              className="flex items-center gap-1.5 bg-[#2C3E8F] text-white rounded-full px-3 py-1 text-[11px] font-bold shadow-md hover:bg-[#1a2a6c] transition-all"
+            >
+              <Volume2 size={12} />
+              <span>Listen Audio</span>
+            </button>
           </div>
           <p className="text-[#222831] text-sm leading-relaxed">
             {description}
@@ -1205,158 +1336,353 @@ function StoryScreen({ onBack, selectedSite }: { onBack: () => void; selectedSit
   );
 }
 
-function AudioGuideScreen({ onBack }: { onBack: () => void }) {
+function AudioGuideScreen({ onBack, selectedSite }: { onBack: () => void; selectedSite: string }) {
   const [playing, setPlaying] = useState(false);
-  const [progress, setProgress] = useState(32);
+  const [rate, setRate] = useState(1);
+  const [progress, setProgress] = useState(0);
+  const [storyData, setStoryData] = useState<StoryData | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  const siteTitle = storyData?.title || selectedSite || "Heritage Site";
+  const narrative = storyData?.narrative || `Explore the rich cultural history and sacred heritage of ${selectedSite || "this monument"}.`;
+
+  // Fetch story data for the detected site
+  useEffect(() => {
+    if (!selectedSite) {
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
+    generateStory(selectedSite)
+      .then(data => setStoryData(data))
+      .catch(() => setStoryData(null))
+      .finally(() => setLoading(false));
+  }, [selectedSite]);
+
+  // Handle SpeechSynthesis audio playback
+  const speakText = useCallback((text: string, playbackRate: number) => {
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = playbackRate;
+      utterance.pitch = 1.0;
+
+      const voices = window.speechSynthesis.getVoices();
+      const preferredVoice = voices.find(v => v.lang.startsWith('en') && (v.name.includes('Natural') || v.name.includes('Google') || v.name.includes('Samantha')));
+      if (preferredVoice) utterance.voice = preferredVoice;
+
+      utterance.onend = () => {
+        setPlaying(false);
+        setProgress(100);
+      };
+
+      utterance.onboundary = (e) => {
+        if (text.length > 0) {
+          const pct = Math.min(100, Math.round((e.charIndex / text.length) * 100));
+          setProgress(pct);
+        }
+      };
+
+      window.speechSynthesis.speak(utterance);
+      setPlaying(true);
+    }
+  }, []);
+
+  const togglePlay = () => {
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      if (playing) {
+        window.speechSynthesis.pause();
+        setPlaying(false);
+      } else {
+        if (window.speechSynthesis.paused) {
+          window.speechSynthesis.resume();
+          setPlaying(true);
+        } else {
+          speakText(narrative, rate);
+        }
+      }
+    }
+  };
+
+  const handleRateChange = () => {
+    const nextRate = rate === 1 ? 1.25 : rate === 1.25 ? 1.5 : 1;
+    setRate(nextRate);
+    if (playing) {
+      speakText(narrative, nextRate);
+    }
+  };
+
+  // Stop speech synthesis when navigating away
+  useEffect(() => {
+    return () => {
+      if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+    };
+  }, []);
+
   const tracks = [
-    { title: "Welcome to Boudhanath", duration: "3:24", active: true },
-    { title: "The Architecture Explained", duration: "5:12", active: false },
-    { title: "Legends & Mythology", duration: "4:08", active: false },
-    { title: "Pilgrimage Traditions", duration: "6:45", active: false },
+    { title: `History of ${selectedSite || "Site"}`, duration: "Full Narrative", active: true },
+    { title: "Architecture & Structural Highlights", duration: "Detailed Overview", active: false },
+    { title: "Cultural & Religious Traditions", duration: "Sacred Context", active: false },
   ];
+
   return (
     <div className="flex flex-col bg-[#FFFDF8] min-h-[852px]">
-      <div className="px-5 pt-16 pb-3 flex items-center gap-3">
-        <button onClick={onBack} className="w-9 h-9 rounded-full bg-[#F6F0E7] flex items-center justify-center">
-          <ArrowLeft size={18} className="text-[#222831]" />
+      <div className="px-5 pt-16 pb-3 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <button onClick={onBack} className="w-9 h-9 rounded-full bg-[#F6F0E7] flex items-center justify-center">
+            <ArrowLeft size={18} className="text-[#222831]" />
+          </button>
+          <span className="text-[#222831] text-base font-black">AI Audio Guide</span>
+        </div>
+        <button
+          onClick={handleRateChange}
+          className="bg-[#2C3E8F]/10 text-[#2C3E8F] text-xs font-bold px-3 py-1.5 rounded-full"
+        >
+          {rate}x Speed
         </button>
-        <span className="text-[#222831] text-base font-black">Audio Guide</span>
       </div>
-      {/* Player hero */}
-      <div className="mx-5 rounded-3xl overflow-hidden relative h-52 bg-[#F6F0E7] mb-5">
-        <img src="https://images.unsplash.com/photo-1761048804017-caa6ed93b8d1?w=400&h=250&fit=crop" alt="audio" className="w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#1a2a6c]/80 to-transparent" />
+
+      {/* Player Hero */}
+      <div className="mx-5 rounded-3xl overflow-hidden relative h-52 bg-[#F6F0E7] mb-5 shadow-lg">
+        <img src={getSiteImage(selectedSite || "Bindhyabasini Temple")} alt="audio" className="w-full h-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#1a2a6c]/90 via-[#1a2a6c]/30 to-transparent" />
         <div className="absolute bottom-4 left-4 right-4">
-          <Badge label="Track 1 of 4" color="gold" />
-          <h2 className="text-white font-black text-lg mt-2 leading-tight">Welcome to Boudhanath</h2>
-          <p className="text-white/60 text-xs mt-1">Narrated by Ara · 3:24 mins</p>
+          <div className="flex items-center gap-2 mb-1">
+            <Badge label="AI Voice Narrator" color="gold" />
+            <MascotSVG size={20} animate={playing} />
+          </div>
+          <h2 className="text-white font-black text-lg leading-tight line-clamp-1">{siteTitle}</h2>
+          <p className="text-white/70 text-xs mt-1">Narrated by Ara · {selectedSite || "Heritage Site"}</p>
         </div>
-        <div className="absolute top-4 right-4 flex items-center gap-1.5 bg-black/30 backdrop-blur-md rounded-full px-2 py-1">
-          <Volume2 size={10} className="text-white" />
-          <span className="text-white text-[10px] font-medium">HD Audio</span>
+        <div className="absolute top-4 right-4 flex items-center gap-1.5 bg-black/40 backdrop-blur-md rounded-full px-3 py-1 border border-white/20">
+          <Volume2 size={12} className="text-[#D4A017]" />
+          <span className="text-white text-[10px] font-bold">HD Voice</span>
         </div>
       </div>
-      {/* Controls */}
+
+      {/* Audio Waveform / Controls */}
       <div className="px-5 mb-6">
-        <div className="mb-3">
-          <div className="h-1.5 bg-[#F6F0E7] rounded-full relative cursor-pointer">
-            <div className="h-full bg-[#2C3E8F] rounded-full" style={{ width: `${progress}%` }} />
-            <div className="absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-[#2C3E8F] rounded-full shadow-md" style={{ left: `calc(${progress}% - 8px)` }} />
+        {/* Animated Waveform Equalizer when playing */}
+        <div className="flex items-center justify-center gap-1 h-8 mb-4">
+          {[0.4, 0.9, 0.5, 0.7, 1.0, 0.6, 0.8, 0.4, 0.9, 0.5, 0.7, 0.3].map((h, i) => (
+            <motion.div
+              key={i}
+              className="w-1.5 bg-[#2C3E8F] rounded-full"
+              animate={playing ? { height: ["20%", `${h * 100}%`, "20%"] } : { height: "20%" }}
+              transition={{ duration: 0.8, repeat: Infinity, delay: i * 0.08 }}
+            />
+          ))}
+        </div>
+
+        {/* Progress Bar */}
+        <div className="mb-4">
+          <div className="h-2 bg-[#F6F0E7] rounded-full relative overflow-hidden">
+            <div className="h-full bg-[#2C3E8F] rounded-full transition-all duration-300" style={{ width: `${progress}%` }} />
           </div>
-          <div className="flex justify-between mt-1">
-            <span className="text-[#6B7280] text-xs">1:04</span>
-            <span className="text-[#6B7280] text-xs">3:24</span>
+          <div className="flex justify-between mt-1.5">
+            <span className="text-[#6B7280] text-xs font-semibold">{progress}% Spoken</span>
+            <span className="text-[#6B7280] text-xs font-semibold">Web Speech AI</span>
           </div>
         </div>
+
+        {/* Action Controls */}
         <div className="flex items-center justify-center gap-6">
-          <button className="w-10 h-10 flex items-center justify-center"><SkipBack size={22} className="text-[#6B7280]" /></button>
-          <motion.button whileTap={{ scale: 0.9 }}
-            onClick={() => setPlaying(p => !p)}
-            className="w-16 h-16 rounded-full bg-[#2C3E8F] flex items-center justify-center shadow-lg shadow-[#2C3E8F]/30">
-            {playing ? <Pause size={26} className="text-white" /> : <Play size={26} className="text-white ml-1" />}
+          <button onClick={() => setProgress(0)} className="w-10 h-10 flex items-center justify-center rounded-full bg-[#F6F0E7]">
+            <RotateCcw size={18} className="text-[#222831]" />
+          </button>
+
+          <motion.button
+            whileTap={{ scale: 0.9 }}
+            onClick={togglePlay}
+            className="w-16 h-16 rounded-full bg-[#2C3E8F] flex items-center justify-center shadow-xl shadow-[#2C3E8F]/30"
+          >
+            {playing ? <Pause size={28} className="text-white" /> : <Play size={28} className="text-white ml-1" />}
           </motion.button>
-          <button className="w-10 h-10 flex items-center justify-center"><SkipForward size={22} className="text-[#6B7280]" /></button>
+
+          <button onClick={() => speakText(narrative, rate)} className="w-10 h-10 flex items-center justify-center rounded-full bg-[#F6F0E7]">
+            <Volume2 size={18} className="text-[#2C3E8F]" />
+          </button>
         </div>
       </div>
-      {/* Track list */}
-      <div className="px-5 flex-1">
-        <h3 className="text-[#222831] text-sm font-black mb-3">All Tracks</h3>
-        <div className="flex flex-col gap-2">
-          {tracks.map((t, i) => (
-            <div key={t.title} className={`flex items-center gap-3 rounded-2xl p-3 ${t.active ? "bg-[#2C3E8F]/8 border border-[#2C3E8F]/20" : "bg-white border border-[#2C3E8F]/6"}`}>
-              <div className={`w-10 h-10 rounded-full flex items-center justify-center ${t.active ? "bg-[#2C3E8F]" : "bg-[#F6F0E7]"}`}>
-                {t.active ? <Pause size={14} className="text-white" /> : <span className="text-[#6B7280] text-xs font-bold">{i + 1}</span>}
-              </div>
-              <div className="flex-1">
-                <p className={`text-sm font-bold ${t.active ? "text-[#2C3E8F]" : "text-[#222831]"}`}>{t.title}</p>
-                <p className="text-[#6B7280] text-xs">{t.duration}</p>
-              </div>
-              {t.active && <div className="flex gap-0.5">{[1, 2, 3].map(b => <motion.div key={b} className="w-0.5 h-4 bg-[#2C3E8F] rounded-full" animate={{ scaleY: [0.3, 1, 0.3] }} transition={{ duration: 0.8, repeat: Infinity, delay: b * 0.1 }} />)}</div>}
+
+      {/* Spoken Text Narrative Card */}
+      <div className="px-5 flex-1 pb-8">
+        <h3 className="text-[#222831] text-sm font-black mb-3">AI Narrative Transcript</h3>
+        <div className="bg-white rounded-2xl p-4 border border-[#2C3E8F]/10 shadow-sm leading-relaxed text-sm text-[#222831]">
+          {loading ? (
+            <div className="flex items-center gap-2 text-[#6B7280]">
+              <Loader2 size={16} className="animate-spin text-[#2C3E8F]" />
+              <span>Fetching history narrative for {selectedSite}...</span>
             </div>
-          ))}
+          ) : (
+            <p>{narrative}</p>
+          )}
         </div>
       </div>
     </div>
   );
 }
 
-function MapScreen({ onNav, onBack }: { onNav: (s: Screen) => void; onBack: () => void }) {
-  const places = [
-    { name: "Pashupatinath", dist: "0.8 km", rating: 4.9, x: 45, y: 38 },
-    { name: "Boudhanath", dist: "2.3 km", rating: 4.8, x: 68, y: 55 },
-    { name: "Swayambhunath", dist: "4.1 km", rating: 4.7, x: 25, y: 62 },
+function MapScreen({ onNav, onBack, onSelectSite }: { onNav: (s: Screen) => void; onBack: () => void; onSelectSite?: (name: string) => void }) {
+  const mapContainerRef = useRef<HTMLDivElement>(null);
+  const mapInstanceRef = useRef<any>(null);
+  const markersRef = useRef<any[]>([]);
+
+  const heritagePlaces = [
+    { name: "Patan Durbar Square", location: "Lalitpur, Nepal", lat: 27.6727, lng: 85.3253, rating: 4.8, dist: "1.2 km" },
+    { name: "Bindhyabasini Temple", location: "Pokhara, Nepal", lat: 28.2380, lng: 83.9856, rating: 4.9, dist: "Pokhara" },
+    { name: "Lumbini", location: "Rupandehi, Nepal", lat: 27.4840, lng: 83.2760, rating: 4.9, dist: "Lumbini" },
+    { name: "Pashupatinath Temple", location: "Kathmandu, Nepal", lat: 27.7104, lng: 85.3487, rating: 4.9, dist: "2.1 km" },
+    { name: "Boudhanath Stupa", location: "Kathmandu Valley", lat: 27.7215, lng: 85.3620, rating: 4.8, dist: "3.5 km" },
   ];
-  const [selected, setSelected] = useState(0);
+
+  const [selectedIdx, setSelectedIdx] = useState(0);
+  const [mapLoaded, setMapLoaded] = useState(false);
+
+  useEffect(() => {
+    let map: any = null;
+
+    async function initLeafletMap() {
+      if (!mapContainerRef.current) return;
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove();
+        mapInstanceRef.current = null;
+      }
+
+      // Import Leaflet dynamically
+      const L = (await import('leaflet')).default;
+      await import('leaflet/dist/leaflet.css');
+
+      const initialSite = heritagePlaces[0];
+      map = L.map(mapContainerRef.current, {
+        center: [initialSite.lat, initialSite.lng],
+        zoom: 12,
+        zoomControl: false,
+      });
+
+      // Add CartoDB Voyager tiles (modern, fast, keyless tile layer)
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        subdomains: 'abcd',
+        maxZoom: 19,
+      }).addTo(map);
+
+      // Custom Heritage Site Pin Icon
+      heritagePlaces.forEach((place, index) => {
+        const customIcon = L.divIcon({
+          className: 'custom-leaflet-pin',
+          html: `<div style="background-color:#2C3E8F; color:white; padding:4px 8px; border-radius:12px; font-weight:bold; font-size:10px; border:2px solid white; box-shadow:0 4px 6px rgba(0,0,0,0.3); white-space:nowrap; cursor:pointer;">📍 ${place.name.split(' ')[0]}</div>`,
+          iconSize: [80, 30],
+          iconAnchor: [40, 15],
+        });
+
+        const marker = L.marker([place.lat, place.lng], { icon: customIcon }).addTo(map);
+        marker.on('click', () => {
+          setSelectedIdx(index);
+          map.flyTo([place.lat, place.lng], 14, { duration: 1.2 });
+        });
+        markersRef.current.push(marker);
+      });
+
+      // Add User Geolocation Pulse if available
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            const userLat = pos.coords.latitude;
+            const userLng = pos.coords.longitude;
+            const userIcon = L.divIcon({
+              className: 'user-location-pin',
+              html: `<div style="width:16px; height:16px; background-color:#2E8B57; border:3px solid white; border-radius:50%; box-shadow:0 0 10px rgba(46,139,87,0.8);"></div>`,
+              iconSize: [16, 16],
+            });
+            L.marker([userLat, userLng], { icon: userIcon }).addTo(map).bindPopup("You are here");
+          },
+          () => {},
+          { timeout: 5000 }
+        );
+      }
+
+      mapInstanceRef.current = map;
+      setMapLoaded(true);
+    }
+
+    initLeafletMap();
+
+    return () => {
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove();
+        mapInstanceRef.current = null;
+      }
+    };
+  }, []);
+
+  const handleSelectPlace = (index: number) => {
+    setSelectedIdx(index);
+    const place = heritagePlaces[index];
+    if (mapInstanceRef.current) {
+      mapInstanceRef.current.flyTo([place.lat, place.lng], 14, { duration: 1 });
+    }
+  };
+
+  const selectedPlace = heritagePlaces[selectedIdx];
+
   return (
     <div className="flex flex-col bg-[#FFFDF8] min-h-[852px]">
       <div className="px-5 pt-16 pb-3 flex items-center gap-3">
         <button onClick={onBack} className="w-9 h-9 rounded-full bg-[#F6F0E7] flex items-center justify-center">
           <ArrowLeft size={18} className="text-[#222831]" />
         </button>
-        <span className="text-[#222831] text-base font-black flex-1">Nearby Heritage</span>
+        <span className="text-[#222831] text-base font-black flex-1">Interactive OpenStreetMap</span>
         <button onClick={() => onNav("search")} className="w-9 h-9 rounded-full bg-[#F6F0E7] flex items-center justify-center">
           <Search size={16} className="text-[#222831]" />
         </button>
       </div>
-      {/* Map */}
-      <div className="mx-5 relative rounded-3xl overflow-hidden mb-4" style={{ height: 340, background: "linear-gradient(135deg, #e8f4d9 0%, #d4e6c3 50%, #c8dbb8 100%)" }}>
-        {/* Grid lines */}
-        {[...Array(6)].map((_, i) => (<div key={`h${i}`} className="absolute left-0 right-0 border-t border-[#2C3E8F]/5" style={{ top: `${i * 20}%` }} />))}
-        {[...Array(6)].map((_, i) => (<div key={`v${i}`} className="absolute top-0 bottom-0 border-l border-[#2C3E8F]/5" style={{ left: `${i * 20}%` }} />))}
-        {/* Roads */}
-        <svg className="absolute inset-0" width="100%" height="100%">
-          <path d="M0 180 Q150 160 300 200 Q350 210 393 190" stroke="#FFFDF8" strokeWidth="8" fill="none" />
-          <path d="M100 0 Q120 100 110 340" stroke="#FFFDF8" strokeWidth="6" fill="none" />
-          <path d="M0 260 Q200 240 393 280" stroke="#FFFDF8" strokeWidth="5" fill="none" />
-        </svg>
-        {/* User location */}
-        <div className="absolute" style={{ left: "50%", top: "50%" }}>
-          <div className="relative -translate-x-1/2 -translate-y-1/2">
-            <div className="w-5 h-5 rounded-full bg-[#2C3E8F] border-2 border-white shadow-lg z-10 relative" />
-            <motion.div className="absolute inset-0 rounded-full bg-[#2C3E8F]/30" animate={{ scale: [1, 2.5], opacity: [0.5, 0] }} transition={{ duration: 2, repeat: Infinity }} />
+
+      {/* Real Map Container */}
+      <div className="mx-5 relative rounded-3xl overflow-hidden mb-4 border border-[#2C3E8F]/15 shadow-inner" style={{ height: 360 }}>
+        <div ref={mapContainerRef} className="w-full h-full z-0" />
+        {!mapLoaded && (
+          <div className="absolute inset-0 bg-[#F6F0E7] flex items-center justify-center gap-2 text-sm text-[#2C3E8F] font-bold">
+            <Loader2 size={18} className="animate-spin" />
+            <span>Loading OpenStreetMap...</span>
           </div>
-        </div>
-        {/* Heritage pins */}
-        {places.map((p, i) => (
-          <motion.button key={p.name} whileTap={{ scale: 0.9 }}
-            onClick={() => setSelected(i)}
-            className="absolute" style={{ left: `${p.x}%`, top: `${p.y}%` }}>
-            <div className={`-translate-x-1/2 -translate-y-full relative ${selected === i ? "scale-125" : ""} transition-transform`}>
-              <div className={`px-2 py-1 rounded-xl text-xs font-bold shadow-lg mb-1 ${selected === i ? "bg-[#2C3E8F] text-white" : "bg-white text-[#222831]"}`}>
-                {p.name.split(" ")[0]}
-              </div>
-              <div className={`w-3 h-3 rounded-full mx-auto ${selected === i ? "bg-[#2C3E8F]" : "bg-[#D4A017]"} shadow-md`} />
-            </div>
-          </motion.button>
-        ))}
+        )}
       </div>
+
       {/* Selected place card */}
       <div className="px-5">
-        <motion.div key={selected} initial={{ y: 10, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
+        <motion.div key={selectedPlace.name} initial={{ y: 10, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
           className="bg-white rounded-3xl p-4 border border-[#2C3E8F]/10 shadow-sm flex items-center gap-3 mb-4">
           <div className="w-14 h-14 rounded-2xl bg-[#F6F0E7] overflow-hidden flex-shrink-0">
-            <img src={`https://images.unsplash.com/photo-1761048800438-730332b87f7a?w=100&h=100&fit=crop`} alt="" className="w-full h-full object-cover" />
+            <img src={getSiteImage(selectedPlace.name)} alt={selectedPlace.name} className="w-full h-full object-cover" />
           </div>
           <div className="flex-1">
-            <p className="text-[#222831] font-black text-sm">{places[selected].name}</p>
+            <p className="text-[#222831] font-black text-sm">{selectedPlace.name}</p>
             <div className="flex items-center gap-2 mt-0.5">
-              <div className="flex items-center gap-1"><Star size={10} className="text-[#D4A017] fill-[#D4A017]" /><span className="text-xs font-bold text-[#222831]">{places[selected].rating}</span></div>
+              <div className="flex items-center gap-1"><Star size={10} className="text-[#D4A017] fill-[#D4A017]" /><span className="text-xs font-bold text-[#222831]">{selectedPlace.rating}</span></div>
               <span className="text-[#6B7280] text-xs">·</span>
-              <span className="text-[#6B7280] text-xs">{places[selected].dist}</span>
+              <span className="text-[#6B7280] text-xs">{selectedPlace.location}</span>
             </div>
           </div>
-          <PrimaryButton label="Go" onClick={() => onNav("details")} icon={<Navigation size={14} />} />
+          <PrimaryButton label="Explore" onClick={() => { onSelectSite?.(selectedPlace.name); onNav("details"); }} icon={<Navigation size={14} />} />
         </motion.div>
+
         {/* List */}
-        <h3 className="text-[#222831] text-sm font-black mb-3">All Nearby ({places.length})</h3>
-        <div className="flex flex-col gap-2">
-          {places.map((p, i) => (
-            <button key={p.name} onClick={() => setSelected(i)}
-              className={`flex items-center gap-3 rounded-2xl p-3 border transition-all ${selected === i ? "border-[#2C3E8F]/30 bg-[#2C3E8F]/5" : "border-[#2C3E8F]/8 bg-white"}`}>
-              <MapPin size={16} className={selected === i ? "text-[#2C3E8F]" : "text-[#6B7280]"} />
-              <span className="flex-1 text-left text-sm font-semibold text-[#222831]">{p.name}</span>
-              <span className="text-[#6B7280] text-xs">{p.dist}</span>
-              <ChevronRight size={14} className="text-[#6B7280]" />
+        <h3 className="text-[#222831] text-sm font-black mb-3">All Sites on Map ({heritagePlaces.length})</h3>
+        <div className="flex flex-col gap-2 pb-6">
+          {heritagePlaces.map((p, i) => (
+            <button key={p.name} onClick={() => handleSelectPlace(i)}
+              className={`flex items-center gap-3 rounded-2xl p-3 border transition-all text-left ${selectedIdx === i ? "bg-[#2C3E8F]/8 border-[#2C3E8F]/30" : "bg-white border-[#2C3E8F]/6"}`}>
+              <div className="w-10 h-10 rounded-xl bg-[#F6F0E7] overflow-hidden flex-shrink-0">
+                <img src={getSiteImage(p.name)} alt="" className="w-full h-full object-cover" />
+              </div>
+              <div className="flex-1">
+                <p className={`text-sm font-bold ${selectedIdx === i ? "text-[#2C3E8F]" : "text-[#222831]"}`}>{p.name}</p>
+                <p className="text-[#6B7280] text-xs">{p.location}</p>
+              </div>
+              <MapPin size={16} className={selectedIdx === i ? "text-[#2C3E8F]" : "text-[#6B7280]"} />
             </button>
           ))}
         </div>
@@ -2001,7 +2327,7 @@ export default function App() {
       case "result": return <ResultScreen onNav={nav} onBack={back} recognitionResult={recognitionResult} recognitionError={recognitionError} onSelectSite={handleSelectSite} />;
       case "details": return <DetailsScreen onNav={nav} onBack={back} selectedSite={selectedSite} />;
       case "story": return <StoryScreen onBack={back} selectedSite={selectedSite} />;
-      case "audio": return <AudioGuideScreen onBack={back} />;
+      case "audio": return <AudioGuideScreen onBack={back} selectedSite={selectedSite} />;
       case "map": return <MapScreen onNav={nav} onBack={back} />;
       case "explore": return <ExploreScreen onNav={nav} onSelectSite={handleSelectSite} />;
       case "search": return <SearchScreen onBack={back} onSelectSite={handleSelectSite} onNav={nav} />;
@@ -2019,11 +2345,11 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FFFDF8] sm:bg-gradient-to-br sm:from-[#1a2a6c] sm:via-[#2C3E8F] sm:to-[#0d1b4a] flex flex-col items-center justify-center">
+    <div className="min-h-screen bg-[#FFFDF8] sm:bg-gradient-to-br sm:from-[#1a2a6c] sm:via-[#2C3E8F] sm:to-[#0d1b4a] flex flex-col items-center justify-center p-0 sm:p-4 md:p-6">
       <PhoneFrame>
         <AnimatePresence mode="wait">
           <motion.div key={active} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }}
-            transition={{ duration: 0.25 }} className="min-h-full">
+            transition={{ duration: 0.25 }} className="min-h-full flex flex-col">
             {renderScreen()}
           </motion.div>
         </AnimatePresence>
