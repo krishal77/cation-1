@@ -10,14 +10,15 @@ const HeritageSite = require('../models/HeritageSite');
  */
 const generateCulturalStory = async (siteName, customPrompt = '') => {
   const apiKey = process.env.GROK_API_KEY || process.env.XAI_API_KEY;
-  const modelName = process.env.GROK_MODEL || 'grok-2-latest';
+  const modelsToTry = [process.env.GROK_MODEL, 'grok-beta', 'grok-2-1212', 'grok-2', 'grok-2-latest'].filter(Boolean);
 
   // 1. Try xAI Grok API if key is configured
   if (apiKey && apiKey !== 'your_grok_api_key_here') {
-    try {
-      console.log(`🤖 Requesting dynamic story from Grok API (${modelName}) for site: '${siteName}'...`);
+    for (const modelName of modelsToTry) {
+      try {
+        console.log(`🤖 Requesting dynamic story from Grok API (${modelName}) for site: '${siteName}'...`);
 
-      const systemPrompt = `You are an expert cultural heritage historian, archaeologist, and audio guide storyteller.
+        const systemPrompt = `You are an expert cultural heritage historian, archaeologist, and audio guide storyteller.
 You specialize in world heritage sites, sacred monuments, and cultural traditions.
 Your task is to generate a captivating, accurate, and deeply immersive narrative for the specified heritage site.
 
@@ -29,29 +30,29 @@ Return strictly a single valid JSON object with no markdown code blocks surround
   "location": "District/Province/Country location string"
 }`;
 
-      let userContent = `Generate a cultural guide story for the site: "${siteName}".`;
-      if (customPrompt && customPrompt.trim().length > 0) {
-        userContent += `\nAdditional Custom Request / Focus: "${customPrompt.trim()}". Ensure the narrative heavily emphasizes this focus.`;
-      }
-
-      const grokResponse = await axios.post(
-        'https://api.x.ai/v1/chat/completions',
-        {
-          model: modelName,
-          messages: [
-            { role: 'system', content: systemPrompt },
-            { role: 'user', content: userContent }
-          ],
-          temperature: 0.7,
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${apiKey}`,
-          },
-          timeout: 25000,
+        let userContent = `Generate a cultural guide story for the site: "${siteName}".`;
+        if (customPrompt && customPrompt.trim().length > 0) {
+          userContent += `\nAdditional Custom Request / Focus: "${customPrompt.trim()}". Ensure the narrative heavily emphasizes this focus.`;
         }
-      );
+
+        const grokResponse = await axios.post(
+          'https://api.x.ai/v1/chat/completions',
+          {
+            model: modelName,
+            messages: [
+              { role: 'system', content: systemPrompt },
+              { role: 'user', content: userContent }
+            ],
+            temperature: 0.7,
+          },
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${apiKey}`,
+            },
+            timeout: 25000,
+          }
+        );
 
       const content = grokResponse.data.choices[0]?.message?.content;
       if (content) {
@@ -72,9 +73,10 @@ Return strictly a single valid JSON object with no markdown code blocks surround
         };
       }
     } catch (grokError) {
-      console.warn('⚠️ Grok API call failed or timed out. Falling back to local catalog:', grokError.response?.data?.error || grokError.message);
+      console.warn('⚠️ Grok API call failed or timed out. Trying next model if available:', grokError.response?.data?.error || grokError.message);
     }
   }
+}
 
   // 2. Fallback to Database / Catalog
   let siteDetails = null;
@@ -98,9 +100,9 @@ Return strictly a single valid JSON object with no markdown code blocks surround
       title: 'The Sacred Grove: Birthplace of the Buddha',
       narrative: 'In 623 BCE, Queen Mayadevi gave birth to Siddhartha Gautama beneath a Sal tree in Lumbini. As a UNESCO World Heritage Site, Lumbini stands as a universal beacon of peace, harboring the Maya Devi Temple, ancient monastic ruins, and the historic Ashoka Pillar erected in 249 BCE.',
       culturalHighlights: [
-        'Maya Devi Temple & Sacred Pond (Puskarini)',
-        'Emperor Ashoka Pillar with original Brahmi inscription',
-        'International Monastic Zone representing global Buddhist traditions'
+        'Sacred Mayadevi Temple & nativity marker stone',
+        'Historic Ashoka Pillar from 249 BCE',
+        'Monastic zone with international Buddhist monasteries'
       ]
     },
     'Patan Durbar Square': {
@@ -114,23 +116,93 @@ Return strictly a single valid JSON object with no markdown code blocks surround
     }
   };
 
-  const storyInfo = defaultStories[siteName] || {
-    title: `Discovering ${siteName}`,
-    narrative: siteDetails?.description || `Explore the rich cultural history and architectural heritage of ${siteName}.`,
-    culturalHighlights: siteDetails?.tags || ['Cultural Heritage', 'Historic Monument']
+  const selectedStory = defaultStories[siteName] || {
+    title: siteDetails?.name ? `Exploring ${siteDetails.name}` : `Sacred Heritage of ${siteName}`,
+    narrative: siteDetails?.description || `Discover the ancient architecture, spiritual energy, and living traditions of ${siteName}.`,
+    culturalHighlights: siteDetails?.tags || ['cultural_heritage', 'sacred_architecture']
   };
 
   return {
     siteName,
-    title: storyInfo.title,
-    narrative: storyInfo.narrative,
-    highlights: storyInfo.culturalHighlights,
+    title: selectedStory.title,
+    narrative: selectedStory.narrative,
+    highlights: selectedStory.culturalHighlights || [],
     location: siteDetails?.location || 'Nepal',
-    source: 'Local Heritage Catalog (Fallback)',
-    generatedAt: new Date()
+    source: 'Culture Guide Curated Catalog',
+    generatedAt: new Date(),
+  };
+};
+
+/**
+ * Interactive human-like tour guide conversation with Ara powered by Grok AI API.
+ */
+const chatWithGuide = async (siteName, userMessage, history = [], userApiKey = '') => {
+  const apiKey = userApiKey || process.env.GROK_API_KEY || process.env.XAI_API_KEY;
+  const modelName = process.env.GROK_MODEL || 'grok-2-latest';
+
+  const systemPrompt = `You are Ara, a warm, charismatic, human-like cultural heritage guide and storytelling companion.
+You are walking with the user at the heritage site: "${siteName || 'Cultural Heritage Site'}".
+Speak conversationally, engagingly, and naturally, like a passionate local guide explaining history and answering questions.
+Keep responses concise (2-4 sentences max per turn) so it sounds natural when spoken aloud via voice synthesis.
+Be enthusiastic, respectful of local traditions, and ready to answer any questions about history, architecture, legends, or customs.`;
+
+  if (apiKey && apiKey !== 'your_grok_api_key_here') {
+    try {
+      const messages = [
+        { role: 'system', content: systemPrompt },
+        ...(Array.isArray(history) ? history.map(h => ({ role: h.sender === 'user' ? 'user' : 'assistant', content: h.text })) : []),
+        { role: 'user', content: userMessage }
+      ];
+
+      const grokResponse = await axios.post(
+        'https://api.x.ai/v1/chat/completions',
+        {
+          model: modelName,
+          messages,
+          temperature: 0.7,
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiKey}`,
+          },
+          timeout: 25000,
+        }
+      );
+
+      const reply = grokResponse.data.choices[0]?.message?.content;
+      if (reply) {
+        return {
+          reply: reply.trim(),
+          source: 'xAI Grok API',
+          model: modelName,
+        };
+      }
+    } catch (err) {
+      console.warn('⚠️ Grok chat API call failed:', err.response?.data?.error || err.message);
+    }
+  }
+
+  // Fallback human-like responses if API key is missing or fails
+  const lowerMsg = userMessage.toLowerCase();
+  let fallbackReply = `That's a fascinating question about ${siteName || 'this sacred monument'}! `;
+  if (lowerMsg.includes('who built') || lowerMsg.includes('builder') || lowerMsg.includes('king') || lowerMsg.includes('origin')) {
+    fallbackReply += `This monument was commissioned by ancient royal dynasties and visionary master craftsmen who blended profound spiritual geometry with timeless stone carving.`;
+  } else if (lowerMsg.includes('secret') || lowerMsg.includes('legend') || lowerMsg.includes('myth') || lowerMsg.includes('story')) {
+    fallbackReply += `Local oral traditions tell us that during full moon festivals, priests performed ancient rituals here to channel blessings and protect the surrounding valley.`;
+  } else if (lowerMsg.includes('when') || lowerMsg.includes('year') || lowerMsg.includes('how old') || lowerMsg.includes('age')) {
+    fallbackReply += `The foundations date back several centuries, standing resiliently through historical eras and earthquakes while remaining an active center of worship.`;
+  } else {
+    fallbackReply += `As your guide Ara, I recommend taking a moment to admire the intricate carved windows and doorway lintels—every carved motif carries a sacred symbol of protection.`;
+  }
+
+  return {
+    reply: fallbackReply,
+    source: 'Ara Interactive Guide (Provide Grok API key for live AI voice responses)',
   };
 };
 
 module.exports = {
   generateCulturalStory,
+  chatWithGuide,
 };

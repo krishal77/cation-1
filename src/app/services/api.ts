@@ -160,6 +160,29 @@ export async function generateStory(
   });
 }
 
+export interface ChatGuideMessage {
+  sender: 'user' | 'ara';
+  text: string;
+}
+
+export interface ChatGuideResponse {
+  reply: string;
+  source: string;
+  model?: string;
+}
+
+export async function chatWithGuide(
+  siteName: string,
+  userMessage: string,
+  history?: ChatGuideMessage[],
+  apiKey?: string
+): Promise<ChatGuideResponse> {
+  return request<ChatGuideResponse>('/story/chat', {
+    method: 'POST',
+    body: JSON.stringify({ siteName, userMessage, history, apiKey }),
+  });
+}
+
 // ── Health Check ───────────────────────────────────────────────────────────
 export async function checkHealth(): Promise<{ status: string; service: string }> {
   const response = await fetch('/health');
