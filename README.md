@@ -1,8 +1,7 @@
 
   # Culture Guide AI Mobile UI
 
-  This is a code bundle for Culture Guide AI Mobile UI. The original project is available at https://www.figma.com/design/sBcj8yKkPW3X5zOHKiqui5/Culture-Guide-AI-Mobile-UI.
-
+ 
   ## Running the code
 
   Run `npm i` to install the dependencies.
