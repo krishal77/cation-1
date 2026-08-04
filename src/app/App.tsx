@@ -89,9 +89,9 @@ function MascotSVG({ size = 80, animate = false }: { size?: number; animate?: bo
 // ── Shared UI Components ───────────────────────────────────────────────────
 function PhoneFrame({ children }: { children: React.ReactNode }) {
   return (
-    <div className="relative w-[393px] h-[852px] bg-[#FFFDF8] overflow-hidden rounded-[52px] shadow-2xl border border-[#2C3E8F]/10 flex-shrink-0">
-      {/* Status bar */}
-      <div className="absolute top-0 left-0 right-0 h-14 z-50 flex items-end px-8 pb-2">
+    <div className="relative w-full h-full min-h-screen sm:min-h-0 sm:w-[393px] sm:h-[852px] bg-[#FFFDF8] overflow-hidden sm:rounded-[52px] sm:shadow-2xl sm:border sm:border-[#2C3E8F]/10 flex-shrink-0">
+      {/* Status bar (desktop preview only) */}
+      <div className="hidden sm:flex absolute top-0 left-0 right-0 h-14 z-50 items-end px-8 pb-2">
         <div className="flex-1 text-[11px] font-semibold text-[#222831]">9:41</div>
         <div className="w-28 h-7 bg-black rounded-full absolute left-1/2 -translate-x-1/2 top-2" />
         <div className="flex gap-1 items-center">
@@ -647,31 +647,130 @@ function HomeScreen({ onNav, onScan, onSelectSite }: { onNav: (s: Screen) => voi
 
 function CameraScreen({ onScan, onBack, onFileSelect }: { onScan: () => void; onBack: () => void; onFileSelect: (file: File) => void }) {
   const [scanning, setScanning] = useState(false);
+  const [cameraActive, setCameraActive] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+
+  // Initialize live camera hardware on mount
+  useEffect(() => {
+    let isMounted = true;
+
+    async function startCamera() {
+      try {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+          return;
+        }
+
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: { ideal: "environment" },
+            width: { ideal: 1920 },
+            height: { ideal: 1080 }
+          },
+          audio: false,
+        });
+
+        if (isMounted) {
+          streamRef.current = stream;
+          if (videoRef.current) {
+            videoRef.current.srcObject = stream;
+            videoRef.current.play().catch(() => {});
+          }
+          setCameraActive(true);
+        } else {
+          stream.getTracks().forEach(t => t.stop());
+        }
+      } catch (err: unknown) {
+        console.warn("Live camera access failed, falling back to file picker:", err);
+        if (isMounted) {
+          setCameraActive(false);
+        }
+      }
+    }
+
+    startCamera();
+
+    return () => {
+      isMounted = false;
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+      }
+    };
+  }, []);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       onFileSelect(file);
       setScanning(true);
-      setTimeout(onScan, 800);
+      setTimeout(onScan, 600);
     }
   };
 
-  const handleCapture = () => {
-    // Trigger file picker (simulates camera on mobile, file browser on desktop)
+  const handleShutter = () => {
+    if (cameraActive && videoRef.current && canvasRef.current) {
+      const video = videoRef.current;
+      const canvas = canvasRef.current;
+      canvas.width = video.videoWidth || 640;
+      canvas.height = video.videoHeight || 480;
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        canvas.toBlob((blob) => {
+          if (blob) {
+            const capturedFile = new File([blob], `camera_capture_${Date.now()}.jpg`, { type: 'image/jpeg' });
+            onFileSelect(capturedFile);
+            setScanning(true);
+            setTimeout(onScan, 600);
+          } else {
+            fileInputRef.current?.click();
+          }
+        }, 'image/jpeg', 0.9);
+        return;
+      }
+    }
+    // Fallback to file/camera picker if live stream not active
     fileInputRef.current?.click();
   };
 
   return (
     <div className="h-full min-h-[852px] bg-black flex flex-col relative overflow-hidden">
-      <input ref={fileInputRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={handleFileChange} />
-      {/* Fake camera view */}
-      <div className="absolute inset-0">
-        <img src="https://images.unsplash.com/photo-1761048803183-fc870f25e221?w=400&h=852&fit=crop&auto=format"
-          alt="camera" className="w-full h-full object-cover opacity-70" />
-        <div className="absolute inset-0 bg-black/30" />
+      <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
+      <canvas ref={canvasRef} className="hidden" />
+
+      {/* Camera View Area */}
+      <div className="absolute inset-0 bg-black flex items-center justify-center">
+        <video
+          ref={videoRef}
+          autoPlay
+          playsInline
+          muted
+          className={`w-full h-full object-cover transition-opacity duration-300 ${cameraActive ? "opacity-100" : "opacity-0"}`}
+        />
+
+        {/* Fallback image view when camera is initializing or permission pending */}
+        {!cameraActive && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center">
+            <img src="https://images.unsplash.com/photo-1761048803183-fc870f25e221?w=400&h=852&fit=crop&auto=format"
+              alt="camera preview" className="w-full h-full object-cover opacity-40 absolute inset-0" />
+            <div className="relative z-10 bg-black/70 backdrop-blur-md rounded-3xl p-6 border border-white/20 shadow-2xl max-w-[300px]">
+              <Camera size={40} className="text-[#D4A017] mx-auto mb-3" />
+              <p className="text-white text-sm font-bold mb-1">Identify Heritage Site</p>
+              <p className="text-white/60 text-xs mb-4">Tap to take a photo or upload an image from gallery</p>
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                className="bg-[#2C3E8F] text-white text-xs font-bold px-5 py-3 rounded-2xl shadow-lg w-full"
+              >
+                Upload / Take Photo
+              </button>
+            </div>
+          </div>
+        )}
+        <div className="absolute inset-0 bg-black/20 pointer-events-none" />
       </div>
+
       {/* Top bar */}
       <div className="relative z-10 flex items-center justify-between px-5 pt-16 pb-4">
         <button onClick={onBack} className="w-10 h-10 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center">
@@ -680,14 +779,14 @@ function CameraScreen({ onScan, onBack, onFileSelect }: { onScan: () => void; on
         <div className="bg-black/40 backdrop-blur-md rounded-full px-4 py-2">
           <p className="text-white text-xs font-semibold">Point at a heritage site</p>
         </div>
-        <button className="w-10 h-10 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center">
-          <Zap size={18} className="text-white" />
+        <button onClick={() => fileInputRef.current?.click()} className="w-10 h-10 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center">
+          <Plus size={18} className="text-white" />
         </button>
       </div>
-      {/* Scan frame */}
+
+      {/* Reticle Frame */}
       <div className="relative z-10 flex-1 flex items-center justify-center">
         <div className="relative w-64 h-64">
-          {/* Corner markers */}
           {[["top-0 left-0 border-t-2 border-l-2", "rounded-tl-2xl"],
             ["top-0 right-0 border-t-2 border-r-2", "rounded-tr-2xl"],
             ["bottom-0 left-0 border-b-2 border-l-2", "rounded-bl-2xl"],
@@ -695,7 +794,6 @@ function CameraScreen({ onScan, onBack, onFileSelect }: { onScan: () => void; on
           ].map(([pos, round], i) => (
             <div key={i} className={`absolute w-10 h-10 border-[#D4A017] ${pos} ${round}`} />
           ))}
-          {/* Scan line */}
           <motion.div
             className="absolute left-2 right-2 h-0.5 bg-gradient-to-r from-transparent via-[#D4A017] to-transparent"
             animate={{ top: ["10%", "90%", "10%"] }}
@@ -706,19 +804,19 @@ function CameraScreen({ onScan, onBack, onFileSelect }: { onScan: () => void; on
           </div>
         </div>
       </div>
+
       {/* Bottom controls */}
       <div className="relative z-10 px-5 pb-12">
         <div className="flex items-center justify-between mb-6">
-          {[{ icon: Globe, label: "Gallery" }].map(({ icon: Icon, label }) => (
-            <button key={label} onClick={() => fileInputRef.current?.click()} className="flex flex-col items-center gap-1">
-              <div className="w-12 h-12 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center">
-                <Icon size={20} className="text-white" />
-              </div>
-              <span className="text-white/70 text-[10px]">{label}</span>
-            </button>
-          ))}
+          <button onClick={() => fileInputRef.current?.click()} className="flex flex-col items-center gap-1">
+            <div className="w-12 h-12 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center border border-white/20">
+              <Globe size={20} className="text-white" />
+            </div>
+            <span className="text-white/80 text-[10px] font-semibold">Gallery</span>
+          </button>
+
           <motion.button whileTap={{ scale: 0.9 }}
-            onClick={handleCapture}
+            onClick={handleShutter}
             className="w-20 h-20 rounded-full bg-white flex items-center justify-center shadow-2xl relative">
             <div className="w-16 h-16 rounded-full bg-[#2C3E8F] flex items-center justify-center">
               <Camera size={28} className="text-white" />
@@ -726,16 +824,15 @@ function CameraScreen({ onScan, onBack, onFileSelect }: { onScan: () => void; on
             {scanning && <motion.div className="absolute inset-0 rounded-full border-2 border-[#D4A017]"
               animate={{ scale: [1, 1.3], opacity: [1, 0] }} transition={{ duration: 0.6, repeat: Infinity }} />}
           </motion.button>
-          {[{ icon: RotateCcw, label: "Flip" }, { icon: Settings, label: "Settings" }].map(({ icon: Icon, label }) => (
-            <button key={label} className="flex flex-col items-center gap-1">
-              <div className="w-12 h-12 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center">
-                <Icon size={20} className="text-white" />
-              </div>
-              <span className="text-white/70 text-[10px]">{label}</span>
-            </button>
-          ))}
+
+          <button onClick={() => fileInputRef.current?.click()} className="flex flex-col items-center gap-1">
+            <div className="w-12 h-12 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center border border-white/20">
+              <Plus size={20} className="text-white" />
+            </div>
+            <span className="text-white/80 text-[10px] font-semibold">Upload</span>
+          </button>
         </div>
-        <p className="text-white/50 text-xs text-center">Select or capture an image to identify</p>
+        <p className="text-white/70 text-xs text-center font-medium">Tap camera to scan or select a photo from gallery</p>
       </div>
     </div>
   );
@@ -1673,7 +1770,8 @@ function ProfileScreen({ onNav }: { onNav: (s: Screen) => void }) {
   );
 }
 
-function SettingsScreen({ onBack }: { onBack: () => void }) {
+function SettingsScreen({ onBack, onLogout }: { onBack: () => void; onLogout?: () => void }) {
+  const { logout } = useAuth();
   const [darkMode, setDarkMode] = useState(false);
   const [notifications, setNotifications] = useState(true);
   const [autoDownload, setAutoDownload] = useState(false);
@@ -1686,6 +1784,12 @@ function SettingsScreen({ onBack }: { onBack: () => void }) {
     { title: "Appearance", items: [{ label: "Dark Mode", icon: darkMode ? Moon : Sun, toggle: () => setDarkMode(d => !d), val: darkMode }] },
     { title: "Notifications", items: [{ label: "Push Notifications", icon: Bell, toggle: () => setNotifications(n => !n), val: notifications }, { label: "Auto-Download", icon: Download, toggle: () => setAutoDownload(a => !a), val: autoDownload }] },
   ];
+
+  const handleSignOut = () => {
+    logout();
+    onLogout?.();
+  };
+
   return (
     <div className="flex flex-col bg-[#FFFDF8] min-h-[852px]">
       <NavBar title="Settings" onBack={onBack} />
@@ -1717,7 +1821,7 @@ function SettingsScreen({ onBack }: { onBack: () => void }) {
             ))}
           </div>
         </div>
-        <button className="bg-red-50 border border-red-100 rounded-2xl p-4 text-red-500 font-bold text-sm text-center">Sign Out</button>
+        <button onClick={handleSignOut} className="bg-red-50 border border-red-100 rounded-2xl p-4 text-red-500 font-bold text-sm text-center">Sign Out</button>
       </div>
     </div>
   );
@@ -1880,6 +1984,11 @@ export default function App() {
     }
   }, []);
 
+  const handleLogout = useCallback(() => {
+    setHistory([]);
+    setActive("login");
+  }, []);
+
   const renderScreen = () => {
     switch (active) {
       case "splash": return <SplashScreen onDone={() => nav(isAuthenticated ? "home" : "onboarding")} />;
@@ -1901,7 +2010,7 @@ export default function App() {
       case "achievements": return <AchievementsScreen onBack={back} />;
       case "notifications": return <NotificationsScreen onBack={back} />;
       case "profile": return <ProfileScreen onNav={nav} />;
-      case "settings": return <SettingsScreen onBack={back} />;
+      case "settings": return <SettingsScreen onBack={back} onLogout={handleLogout} />;
       case "language": return <LanguageScreen onBack={back} />;
       case "offline": return <OfflineScreen onBack={back} />;
       case "error": return <ErrorScreen onBack={back} />;
@@ -1910,48 +2019,15 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#1a2a6c] via-[#2C3E8F] to-[#0d1b4a] flex flex-col">
-      {/* Screen selector */}
-      <div className="flex-shrink-0 px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <MascotSVG size={32} animate />
-          <div>
-            <p className="text-white font-black text-sm">Culture Guide AI</p>
-            <p className="text-white/50 text-[10px]">Connected to Backend</p>
-          </div>
-        </div>
-        <select
-          value={active}
-          onChange={e => { setHistory([]); setActive(e.target.value as Screen); }}
-          className="bg-white/10 text-white text-xs font-semibold rounded-xl px-3 py-2 border border-white/20 outline-none backdrop-blur-sm max-w-[180px]"
-        >
-          {ALL_SCREENS.map(s => (
-            <option key={s} value={s} className="bg-[#1a2a6c] text-white">{SCREEN_LABELS[s]}</option>
-          ))}
-        </select>
-      </div>
-      {/* Phone mockup */}
-      <div className="flex-1 flex items-center justify-center px-4 pb-8">
-        <PhoneFrame>
-          <AnimatePresence mode="wait">
-            <motion.div key={active} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }}
-              transition={{ duration: 0.25 }} className="min-h-full">
-              {renderScreen()}
-            </motion.div>
-          </AnimatePresence>
-        </PhoneFrame>
-      </div>
-      {/* Screen grid nav */}
-      <div className="flex-shrink-0 px-4 pb-6">
-        <div className="flex flex-wrap gap-1.5 justify-center max-w-2xl mx-auto">
-          {ALL_SCREENS.map(s => (
-            <button key={s} onClick={() => { setHistory([]); setActive(s); }}
-              className={`px-2.5 py-1 rounded-lg text-[10px] font-semibold transition-all ${active === s ? "bg-[#D4A017] text-white" : "bg-white/10 text-white/60 hover:bg-white/20"}`}>
-              {SCREEN_LABELS[s]}
-            </button>
-          ))}
-        </div>
-      </div>
+    <div className="min-h-screen bg-[#FFFDF8] sm:bg-gradient-to-br sm:from-[#1a2a6c] sm:via-[#2C3E8F] sm:to-[#0d1b4a] flex flex-col items-center justify-center">
+      <PhoneFrame>
+        <AnimatePresence mode="wait">
+          <motion.div key={active} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }}
+            transition={{ duration: 0.25 }} className="min-h-full">
+            {renderScreen()}
+          </motion.div>
+        </AnimatePresence>
+      </PhoneFrame>
     </div>
   );
 }
