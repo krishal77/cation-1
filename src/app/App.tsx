@@ -35,16 +35,16 @@ function MascotSVG({ size = 80, animate = false }: { size?: number; animate?: bo
   return (
     <motion.svg
       width={size} height={size} viewBox="0 0 120 120" fill="none"
-      animate={animate ? { y: [0, -8, 0] } : {}}
-      transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+      animate={animate ? { y: [0, -6, 0] } : {}}
+      transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
     >
       {/* Glow aura */}
-      <circle cx="60" cy="60" r="52" fill="url(#aura)" opacity="0.35" />
+      <circle cx="60" cy="60" r="52" fill="url(#aura)" opacity="0.3" />
       {/* Body — floating spirit form */}
       <ellipse cx="60" cy="72" rx="22" ry="14" fill="#23351F" opacity="0.15" />
       <path d="M38 58 Q60 32 82 58 Q78 80 60 84 Q42 80 38 58Z" fill="url(#bodyGrad)" />
       {/* Robe detail */}
-      <path d="M46 64 Q60 70 74 64 Q72 78 60 82 Q48 78 46 64Z" fill="#172514" opacity="0.3" />
+      <path d="M46 64 Q60 70 74 64 Q72 78 60 82 Q48 78 46 64Z" fill="#172514" opacity="0.25" />
       {/* Head */}
       <circle cx="60" cy="48" r="18" fill="url(#headGrad)" />
       {/* Face */}
@@ -57,19 +57,19 @@ function MascotSVG({ size = 80, animate = false }: { size?: number; animate?: bo
       {/* Smile */}
       <path d="M54 55 Q60 60 66 55" stroke="#222E1C" strokeWidth="1.5" strokeLinecap="round" fill="none" />
       {/* Cheeks */}
-      <circle cx="50" cy="53" r="3" fill="#69A20D" opacity="0.4" />
-      <circle cx="70" cy="53" r="3" fill="#69A20D" opacity="0.4" />
+      <circle cx="50" cy="53" r="3" fill="#69A20D" opacity="0.35" />
+      <circle cx="70" cy="53" r="3" fill="#69A20D" opacity="0.35" />
       {/* Crown / Himalayan motif */}
       <path d="M44 38 L48 28 L52 35 L56 22 L60 32 L64 22 L68 35 L72 28 L76 38" stroke="#69A20D" strokeWidth="2" fill="none" strokeLinejoin="round" />
       <circle cx="60" cy="22" r="3" fill="#69A20D" />
       {/* Wisps / energy trails */}
-      <path d="M34 60 Q26 52 32 42 Q36 36 42 44" stroke="#69A20D" strokeWidth="1.5" fill="none" strokeDasharray="3 3" opacity="0.6" />
-      <path d="M86 60 Q94 52 88 42 Q84 36 78 44" stroke="#69A20D" strokeWidth="1.5" fill="none" strokeDasharray="3 3" opacity="0.6" />
+      <path d="M34 60 Q26 52 32 42 Q36 36 42 44" stroke="#69A20D" strokeWidth="1.5" fill="none" strokeDasharray="3 3" opacity="0.5" />
+      <path d="M86 60 Q94 52 88 42 Q84 36 78 44" stroke="#69A20D" strokeWidth="1.5" fill="none" strokeDasharray="3 3" opacity="0.5" />
       {/* Sparkles */}
       <circle cx="28" cy="38" r="2" fill="#69A20D" opacity="0.8" />
       <circle cx="92" cy="38" r="2" fill="#69A20D" opacity="0.8" />
-      <circle cx="32" cy="76" r="1.5" fill="#23351F" opacity="0.5" />
-      <circle cx="88" cy="76" r="1.5" fill="#23351F" opacity="0.5" />
+      <circle cx="32" cy="76" r="1.5" fill="#23351F" opacity="0.4" />
+      <circle cx="88" cy="76" r="1.5" fill="#23351F" opacity="0.4" />
       <defs>
         <radialGradient id="aura" cx="50%" cy="50%" r="50%">
           <stop offset="0%" stopColor="#69A20D" />
@@ -91,7 +91,7 @@ function MascotSVG({ size = 80, animate = false }: { size?: number; animate?: bo
 // ── Shared UI Components ───────────────────────────────────────────────────
 function PhoneFrame({ children }: { children: React.ReactNode }) {
   return (
-    <div className="relative w-full h-full min-h-screen sm:min-h-[840px] sm:h-[852px] sm:max-w-md md:max-w-lg lg:max-w-xl bg-[#FFFFFF] overflow-hidden sm:rounded-[36px] sm:shadow-xl sm:border sm:border-[#E4E7EB] flex-shrink-0 transition-all duration-300">
+    <div className="relative w-full h-full min-h-screen sm:min-h-[840px] sm:h-[852px] sm:max-w-md md:max-w-lg lg:max-w-xl bg-[#FFFFFF] overflow-hidden sm:rounded-[36px] sm:shadow-[0_12px_48px_rgba(35,53,31,0.12)] sm:border sm:border-[#E4E7EB] flex-shrink-0 transition-all duration-300">
       {/* Simulated status bar (visible on desktop frame) */}
       <div className="hidden sm:flex absolute top-0 left-0 right-0 h-12 z-50 items-center justify-between px-8 text-[#222E1C]">
         <span className="text-[11px] font-bold tracking-tight">9:41</span>
@@ -110,13 +110,13 @@ function PhoneFrame({ children }: { children: React.ReactNode }) {
 
 function NavBar({ title, onBack, right }: { title?: string; onBack?: () => void; right?: React.ReactNode }) {
   return (
-    <div className="sticky top-0 z-40 bg-white/90 backdrop-blur-md px-5 pt-12 sm:pt-14 pb-3.5 flex items-center gap-3 border-b border-[#E4E7EB] shadow-xs">
+    <div className="sticky top-0 z-40 bg-white/95 backdrop-blur-md px-5 pt-12 sm:pt-14 pb-3.5 flex items-center gap-3 border-b border-[#E4E7EB] shadow-[0_2px_12px_rgba(0,0,0,0.02)]">
       {onBack && (
-        <motion.button whileTap={{ scale: 0.94 }} onClick={onBack} className="w-9 h-9 rounded-full bg-[#EEF1F3] flex items-center justify-center flex-shrink-0 hover:bg-[#CAE5B1]/50 transition-colors text-[#222E1C]">
+        <motion.button whileTap={{ scale: 0.94 }} onClick={onBack} className="w-9 h-9 rounded-full bg-[#EEF1F3] flex items-center justify-center flex-shrink-0 hover:bg-[#EAF6DD] transition-colors text-[#222E1C] border border-[#E4E7EB]/50">
           <ArrowLeft size={18} />
         </motion.button>
       )}
-      {title && <h1 className="flex-1 text-lg font-black text-[#222E1C] font-display truncate">{title}</h1>}
+      {title && <h1 className="flex-1 text-lg font-black text-[#222E1C] font-display truncate tracking-tight">{title}</h1>}
       {right && <div className="flex-shrink-0">{right}</div>}
     </div>
   );
@@ -131,15 +131,15 @@ function BottomNav({ active, onNav }: { active: string; onNav: (s: Screen) => vo
     { id: "profile", icon: User, label: "Profile" },
   ] as const;
   return (
-    <div className="sticky bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-[#E4E7EB] px-3 pt-2.5 pb-6 z-40 shadow-sm">
+    <div className="sticky bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-[#E4E7EB] px-3 pt-2.5 pb-6 z-40 shadow-[0_-4px_20px_rgba(0,0,0,0.03)]">
       <div className="flex justify-around items-center max-w-lg mx-auto">
         {items.map(({ id, icon: Icon, label }) => (
           <button key={id} onClick={() => onNav(id as Screen)} className="flex flex-col items-center gap-1 px-3 py-1 relative group">
             {active === id && (
-              <motion.div layoutId="navpill" className="absolute inset-0 bg-[#EAF6DD] rounded-2xl border border-[#CAE5B1]/40" transition={{ type: "spring", stiffness: 400, damping: 30 }} />
+              <motion.div layoutId="navpill" className="absolute inset-0 bg-[#EAF6DD] rounded-2xl border border-[#CAE5B1]/50" transition={{ type: "spring", stiffness: 400, damping: 30 }} />
             )}
-            <Icon size={22} className={`transition-colors relative z-10 ${active === id ? "text-[#69A20D]" : "text-[#5F6B5E] group-hover:text-[#222E1C]"}`} />
-            <span className={`text-[10px] font-bold transition-colors relative z-10 ${active === id ? "text-[#23351F]" : "text-[#5F6B5E] group-hover:text-[#222E1C]"}`}>{label}</span>
+            <Icon size={21} className={`transition-colors relative z-10 ${active === id ? "text-[#69A20D]" : "text-[#5F6B5E] group-hover:text-[#222E1C]"}`} />
+            <span className={`text-[10px] font-bold tracking-tight transition-colors relative z-10 ${active === id ? "text-[#23351F]" : "text-[#5F6B5E] group-hover:text-[#222E1C]"}`}>{label}</span>
           </button>
         ))}
       </div>
@@ -159,7 +159,7 @@ function Badge({ label, color = "gold" }: { label: string; color?: "gold" | "ind
 
 function Chip({ label, active, onClick }: { label: string; active?: boolean; onClick?: () => void }) {
   return (
-    <button onClick={onClick} className={`px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${active ? "bg-[#23351F] text-white shadow-sm border border-[#23351F]" : "bg-[#EEF1F3] text-[#5F6B5E] border border-[#E4E7EB] hover:bg-[#EAF6DD] hover:text-[#222E1C]"}`}>
+    <button onClick={onClick} className={`px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-200 ${active ? "bg-[#23351F] text-white shadow-sm border border-[#23351F]" : "bg-[#EEF1F3] text-[#5F6B5E] border border-[#E4E7EB] hover:bg-[#EAF6DD] hover:text-[#222E1C]"}`}>
       {label}
     </button>
   );
@@ -181,7 +181,7 @@ function ProgressBar({ value, color = "#69A20D" }: { value: number; color?: stri
 
 function SkeletonCard() {
   return (
-    <div className="bg-white/80 rounded-3xl p-4 animate-pulse border border-[#E4E7EB]">
+    <div className="bg-white/90 rounded-3xl p-4 animate-pulse border border-[#E4E7EB]">
       <div className="h-32 bg-[#EEF1F3] rounded-2xl mb-3" />
       <div className="h-4 bg-[#EEF1F3] rounded-full w-3/4 mb-2" />
       <div className="h-3 bg-[#EEF1F3] rounded-full w-1/2" />
@@ -196,7 +196,7 @@ function HeritageCard({ name, location, img, rating, onClick }: {
     <motion.button
       whileTap={{ scale: 0.97 }}
       onClick={onClick}
-      className="bg-white/90 backdrop-blur-md rounded-3xl overflow-hidden shadow-xs hover:shadow-md border border-[#E4E7EB] flex-shrink-0 w-52 text-left transition-all group"
+      className="bg-white rounded-3xl overflow-hidden shadow-[0_4px_20px_rgba(35,53,31,0.03)] hover:shadow-[0_8px_30px_rgba(35,53,31,0.06)] border border-[#E4E7EB] flex-shrink-0 w-52 text-left transition-all duration-300 group"
     >
       <div className="relative h-32 bg-[#EEF1F3]">
         <img src={img} alt={name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
@@ -204,7 +204,7 @@ function HeritageCard({ name, location, img, rating, onClick }: {
         <div className="absolute top-2.5 right-2.5">
           <Badge label="UNESCO" color="gold" />
         </div>
-        <div className="absolute bottom-2.5 left-2.5 flex items-center gap-1 bg-white/80 backdrop-blur-md px-2 py-0.5 rounded-full border border-white/40">
+        <div className="absolute bottom-2.5 left-2.5 flex items-center gap-1 bg-white/90 backdrop-blur-md px-2 py-0.5 rounded-full border border-white/60 shadow-xs">
           <Star size={10} className="text-[#69A20D] fill-[#69A20D]" />
           <span className="text-[#222E1C] text-[10px] font-bold">{rating}</span>
         </div>
@@ -229,7 +229,7 @@ function InputField({ placeholder, type = "text", icon, value, onChange }: { pla
         placeholder={placeholder}
         value={value}
         onChange={e => onChange?.(e.target.value)}
-        className={`w-full bg-[#EEF1F3] border border-[#E4E7EB] focus:border-[#69A20D] focus:bg-white rounded-2xl py-3.5 text-sm text-[#222E1C] placeholder-[#A7B1A7] outline-none transition-all ${icon ? "pl-12 pr-4" : "px-4"}`}
+        className={`w-full bg-[#EEF1F3] border border-[#E4E7EB] focus:border-[#69A20D] focus:bg-white rounded-2xl py-3.5 text-sm text-[#222E1C] placeholder-[#94A3B8] outline-none transition-all duration-200 ${icon ? "pl-12 pr-4" : "px-4"}`}
       />
     </div>
   );
@@ -238,9 +238,9 @@ function InputField({ placeholder, type = "text", icon, value, onChange }: { pla
 function PrimaryButton({ label, onClick, full = false, icon }: { label: string; onClick?: () => void; full?: boolean; icon?: React.ReactNode }) {
   return (
     <motion.button
-      whileTap={{ scale: 0.96 }}
+      whileTap={{ scale: 0.97 }}
       onClick={onClick}
-      className={`bg-[#23351F] text-white font-bold rounded-2xl py-3.5 px-6 text-sm shadow-md hover:bg-[#1a2917] flex items-center justify-center gap-2 transition-all ${full ? "w-full" : ""}`}
+      className={`bg-[#23351F] text-white font-bold rounded-2xl py-3.5 px-6 text-sm shadow-[0_4px_16px_rgba(35,53,31,0.2)] hover:bg-[#1a2917] flex items-center justify-center gap-2 transition-all duration-200 ${full ? "w-full" : ""}`}
     >
       {icon}{label}
     </motion.button>
@@ -250,9 +250,9 @@ function PrimaryButton({ label, onClick, full = false, icon }: { label: string; 
 function GoldButton({ label, onClick, full = false }: { label: string; onClick?: () => void; full?: boolean }) {
   return (
     <motion.button
-      whileTap={{ scale: 0.96 }}
+      whileTap={{ scale: 0.97 }}
       onClick={onClick}
-      className={`bg-[#69A20D] text-white font-bold rounded-2xl py-3.5 px-6 text-sm shadow-md hover:bg-[#58890a] transition-all ${full ? "w-full" : ""}`}
+      className={`bg-[#69A20D] text-white font-bold rounded-2xl py-3.5 px-6 text-sm shadow-[0_4px_16px_rgba(105,162,13,0.25)] hover:bg-[#58890a] transition-all duration-200 ${full ? "w-full" : ""}`}
     >
       {label}
     </motion.button>
@@ -262,9 +262,9 @@ function GoldButton({ label, onClick, full = false }: { label: string; onClick?:
 function GhostButton({ label, onClick, full = false }: { label: string; onClick?: () => void; full?: boolean }) {
   return (
     <motion.button
-      whileTap={{ scale: 0.96 }}
+      whileTap={{ scale: 0.97 }}
       onClick={onClick}
-      className={`bg-white text-[#23351F] border border-[#CAE5B1] font-bold rounded-2xl py-3.5 px-6 text-sm hover:bg-[#EAF6DD] transition-all shadow-xs ${full ? "w-full" : ""}`}
+      className={`bg-white text-[#23351F] border border-[#CAE5B1] font-bold rounded-2xl py-3.5 px-6 text-sm hover:bg-[#EAF6DD] transition-all duration-200 shadow-xs ${full ? "w-full" : ""}`}
     >
       {label}
     </motion.button>
@@ -275,43 +275,43 @@ function SplashScreen({ onDone }: { onDone: () => void }) {
   useEffect(() => { const t = setTimeout(onDone, 3000); return () => clearTimeout(t); }, [onDone]);
   return (
     <div className="h-full min-h-full flex-1 flex flex-col items-center justify-center relative overflow-hidden bg-[#F7F9F6]"
-      style={{ background: "linear-gradient(160deg, #23351F 0%, #354f2f 50%, #172514 100%)" }}>
+      style={{ background: "linear-gradient(160deg, #23351F 0%, #2e4429 50%, #172514 100%)" }}>
       {/* Background mandala rings */}
       {[120, 200, 280, 360].map((r, i) => (
         <motion.div key={i} className="absolute rounded-full border border-white/10"
           style={{ width: r, height: r }}
           animate={{ rotate: i % 2 === 0 ? 360 : -360 }}
-          transition={{ duration: 20 + i * 5, repeat: Infinity, ease: "linear" }}
+          transition={{ duration: 24 + i * 6, repeat: Infinity, ease: "linear" }}
         />
       ))}
       {/* Sage particles */}
       {[...Array(12)].map((_, i) => (
         <motion.div key={i} className="absolute w-1.5 h-1.5 rounded-full bg-[#69A20D]"
           style={{ left: `${10 + (i * 7) % 80}%`, top: `${10 + (i * 11) % 80}%` }}
-          animate={{ y: [0, -20, 0], opacity: [0.3, 1, 0.3] }}
-          transition={{ duration: 2 + i * 0.3, repeat: Infinity, delay: i * 0.2 }}
+          animate={{ y: [0, -20, 0], opacity: [0.3, 0.9, 0.3] }}
+          transition={{ duration: 2.4 + i * 0.3, repeat: Infinity, delay: i * 0.2 }}
         />
       ))}
-      <motion.div initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ duration: 0.8 }} className="flex flex-col items-center gap-6 z-10">
+      <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ duration: 0.8 }} className="flex flex-col items-center gap-6 z-10">
         <MascotSVG size={120} animate />
         <div className="text-center">
-          <motion.h1 initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }}
+          <motion.h1 initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }}
             className="text-4xl font-black text-white tracking-tight leading-tight font-display">
             Culture<br /><span className="text-[#CAE5B1]">Guide</span> AI
           </motion.h1>
-          <motion.p initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.6 }}
-            className="text-[#CAE5B1]/80 text-sm mt-2 font-semibold">Your Living UNESCO Heritage Guide</motion.p>
+          <motion.p initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.5 }}
+            className="text-[#CAE5B1]/80 text-sm mt-2 font-semibold tracking-wide">Your Living UNESCO Heritage Guide</motion.p>
         </div>
       </motion.div>
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.5 }}
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.2 }}
         className="absolute bottom-20 flex flex-col items-center gap-3 z-10">
         <div className="flex gap-1.5">
           {[0, 1, 2].map(i => (
             <motion.div key={i} className="w-1.5 h-1.5 rounded-full bg-[#69A20D]"
-              animate={{ scale: [1, 1.5, 1] }} transition={{ duration: 1.2, repeat: Infinity, delay: i * 0.2 }} />
+              animate={{ scale: [1, 1.4, 1] }} transition={{ duration: 1.2, repeat: Infinity, delay: i * 0.2 }} />
           ))}
         </div>
-        <p className="text-white/60 text-xs font-medium">Powered by OpenCLIP AI</p>
+        <p className="text-white/60 text-xs font-medium tracking-wide">Powered by OpenCLIP AI</p>
       </motion.div>
     </div>
   );
@@ -349,12 +349,12 @@ function OnboardingScreen({ onDone }: { onDone: () => void }) {
             <motion.img key={step} src={cur.img} alt={cur.title}
               className="w-full h-full object-cover"
               initial={{ x: 40, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: -40, opacity: 0 }}
-              transition={{ duration: 0.4 }} />
+              transition={{ duration: 0.35 }} />
           </AnimatePresence>
           <div className="absolute inset-0 bg-gradient-to-t from-[#F7F9F6] via-transparent to-transparent" />
         </div>
         <div className="absolute top-16 right-5">
-          <button onClick={onDone} className="text-[#222E1C] text-xs font-bold bg-white/80 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-[#E4E7EB] shadow-xs">Skip</button>
+          <button onClick={onDone} className="text-[#222E1C] text-xs font-bold bg-white/90 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-[#E4E7EB] shadow-xs">Skip</button>
         </div>
       </div>
       <div className="flex-1 flex flex-col px-6 pt-2">
@@ -364,7 +364,7 @@ function OnboardingScreen({ onDone }: { onDone: () => void }) {
           ))}
         </div>
         <AnimatePresence mode="wait">
-          <motion.div key={step} initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: -20, opacity: 0 }}>
+          <motion.div key={step} initial={{ y: 16, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: -16, opacity: 0 }}>
             <Badge label={cur.badge} color="gold" />
             <h2 className="text-3xl font-black text-[#222E1C] mt-3 leading-tight font-display">{cur.title}</h2>
             <p className="text-[#5F6B5E] text-base leading-relaxed mt-3">{cur.body}</p>
@@ -408,9 +408,9 @@ function LoginScreen({ onDone, onRegister }: { onDone: () => void; onRegister: (
       <div className="flex flex-col items-center mb-8">
         <MascotSVG size={72} animate />
         <h1 className="text-3xl font-black text-[#222E1C] mt-4 font-display">Welcome Back</h1>
-        <p className="text-[#5F6B5E] text-sm mt-1">Sign in to continue your heritage journey</p>
+        <p className="text-[#5F6B5E] text-sm mt-1 font-medium">Sign in to continue your heritage journey</p>
       </div>
-      <div className="flex flex-col gap-4 bg-white/80 backdrop-blur-md p-6 rounded-3xl border border-[#E4E7EB] shadow-sm">
+      <div className="flex flex-col gap-4 bg-white p-6 rounded-3xl border border-[#E4E7EB] shadow-[0_4px_20px_rgba(35,53,31,0.03)]">
         {displayError && (
           <div className="bg-red-50 border border-red-200 rounded-2xl px-4 py-3 text-red-600 text-xs font-medium">
             {displayError}
@@ -424,12 +424,12 @@ function LoginScreen({ onDone, onRegister }: { onDone: () => void; onRegister: (
         <PrimaryButton label={isLoading ? "Signing In..." : "Sign In"} full onClick={handleLogin} />
         <div className="relative flex items-center gap-3 my-1">
           <div className="flex-1 h-px bg-[#E4E7EB]" />
-          <span className="text-[#A7B1A7] text-xs font-medium">or continue with</span>
+          <span className="text-[#94A3B8] text-xs font-medium">or continue with</span>
           <div className="flex-1 h-px bg-[#E4E7EB]" />
         </div>
         <div className="flex gap-3">
           {["Google", "Apple"].map(p => (
-            <button key={p} className="flex-1 flex items-center justify-center gap-2 border border-[#E4E7EB] rounded-2xl py-3 text-xs font-bold text-[#222E1C] bg-[#EEF1F3] hover:bg-[#EAF6DD] transition-all">
+            <button key={p} className="flex-1 flex items-center justify-center gap-2 border border-[#E4E7EB] rounded-2xl py-3 text-xs font-bold text-[#222E1C] bg-[#EEF1F3] hover:bg-[#EAF6DD] transition-all duration-200">
               <Globe size={15} className="text-[#69A20D]" />{p}
             </button>
           ))}
@@ -479,8 +479,8 @@ function RegisterScreen({ onDone, onBack }: { onDone: () => void; onBack: () => 
         <ArrowLeft size={18} />
       </button>
       <h1 className="text-3xl font-black text-[#222E1C] font-display">Join the Journey</h1>
-      <p className="text-[#5F6B5E] text-sm mt-1 mb-6">Create your UNESCO heritage passport</p>
-      <div className="flex flex-col gap-3.5 bg-white/80 backdrop-blur-md p-6 rounded-3xl border border-[#E4E7EB] shadow-sm">
+      <p className="text-[#5F6B5E] text-sm mt-1 mb-6 font-medium">Create your UNESCO heritage passport</p>
+      <div className="flex flex-col gap-3.5 bg-white p-6 rounded-3xl border border-[#E4E7EB] shadow-[0_4px_20px_rgba(35,53,31,0.03)]">
         {displayError && (
           <div className="bg-red-50 border border-red-200 rounded-2xl px-4 py-3 text-red-600 text-xs font-medium">
             {displayError}
@@ -577,8 +577,8 @@ function HomeScreen({ onNav, onScan, onSelectSite }: { onNav: (s: Screen) => voi
       <div className="px-5 pt-12 sm:pt-14 pb-4 bg-gradient-to-b from-[#EAF6DD]/60 via-[#F7F9F6]/40 to-transparent">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-[#5F6B5E] text-xs font-semibold">{getGreeting()}</p>
-            <h1 className="text-xl font-black text-[#222E1C] flex items-center gap-1.5 font-display">
+            <p className="text-[#5F6B5E] text-xs font-medium">{getGreeting()}</p>
+            <h1 className="text-xl font-black text-[#222E1C] flex items-center gap-1.5 font-display tracking-tight">
               {displayName}
               <span className="inline-block w-2 h-2 rounded-full bg-[#69A20D]" />
             </h1>
@@ -593,7 +593,7 @@ function HomeScreen({ onNav, onScan, onSelectSite }: { onNav: (s: Screen) => voi
             </button>
             <button
               onClick={() => onNav("profile")}
-              className="w-10 h-10 rounded-2xl bg-[#23351F] flex items-center justify-center shadow-md hover:bg-[#172514] transition-all"
+              className="w-10 h-10 rounded-2xl bg-[#23351F] flex items-center justify-center shadow-sm hover:bg-[#172514] transition-all"
             >
               <span className="text-white text-xs font-black tracking-wider">{userInitials}</span>
             </button>
@@ -617,8 +617,8 @@ function HomeScreen({ onNav, onScan, onSelectSite }: { onNav: (s: Screen) => voi
         <motion.div
           whileTap={{ scale: 0.98 }}
           onClick={onScan}
-          className="w-full rounded-3xl p-5 relative overflow-hidden shadow-lg cursor-pointer"
-          style={{ background: "linear-gradient(135deg, #23351F 0%, #354f2f 60%, #172514 100%)" }}
+          className="w-full rounded-3xl p-5 relative overflow-hidden shadow-[0_8px_30px_rgba(35,53,31,0.18)] cursor-pointer"
+          style={{ background: "linear-gradient(135deg, #23351F 0%, #2e4429 60%, #172514 100%)" }}
         >
           {/* Subtle Grid pattern overlay */}
           <div className="absolute inset-0 bg-[radial-gradient(#69A20D_1px,transparent_1px)] [background-size:16px_16px] opacity-15 pointer-events-none" />
@@ -711,7 +711,7 @@ function HomeScreen({ onNav, onScan, onSelectSite }: { onNav: (s: Screen) => voi
       {/* Daily Cultural Discovery Highlight Card */}
       <div className="px-5 mb-6">
         <div className="bg-gradient-to-r from-[#EAF6DD] to-white border border-[#CAE5B1] rounded-3xl p-4 flex items-center gap-3 shadow-xs">
-          <div className="w-12 h-12 rounded-2xl bg-[#23351F] text-white flex items-center justify-center flex-shrink-0 shadow-md">
+          <div className="w-12 h-12 rounded-2xl bg-[#23351F] text-white flex items-center justify-center flex-shrink-0 shadow-sm">
             <Compass size={22} className="text-[#CAE5B1]" />
           </div>
           <div className="flex-1">
@@ -748,7 +748,7 @@ function HomeScreen({ onNav, onScan, onSelectSite }: { onNav: (s: Screen) => voi
                 <p className="text-[#222E1C] text-sm font-bold group-hover:text-[#69A20D] transition-colors">{r.name}</p>
                 <div className="flex items-center gap-2 mt-0.5">
                   <span className="text-[#5F6B5E] text-xs">{r.location}</span>
-                  <span className="text-[#A7B1A7] text-xs">·</span>
+                  <span className="text-[#94A3B8] text-xs">·</span>
                   <div className="flex items-center gap-1">
                     <Clock size={10} className="text-[#5F6B5E]" />
                     <span className="text-[#5F6B5E] text-[11px]">{r.time}</span>
@@ -852,7 +852,6 @@ function CameraScreen({ onScan, onBack, onFileSelect }: { onScan: () => void; on
         return;
       }
     }
-    // Fallback to file/camera picker if live stream not active
     fileInputRef.current?.click();
   };
 
@@ -871,18 +870,17 @@ function CameraScreen({ onScan, onBack, onFileSelect }: { onScan: () => void; on
           className={`w-full h-full object-cover transition-opacity duration-300 ${cameraActive ? "opacity-100" : "opacity-0"}`}
         />
 
-        {/* Fallback image view when camera is initializing or permission pending */}
         {!cameraActive && (
           <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center">
             <img src="https://images.unsplash.com/photo-1761048803183-fc870f25e221?w=400&h=852&fit=crop&auto=format"
               alt="camera preview" className="w-full h-full object-cover opacity-40 absolute inset-0" />
             <div className="relative z-10 bg-black/70 backdrop-blur-md rounded-3xl p-6 border border-white/20 shadow-2xl max-w-[300px]">
-              <Camera size={40} className="text-[#D4A017] mx-auto mb-3" />
+              <Camera size={40} className="text-[#69A20D] mx-auto mb-3" />
               <p className="text-white text-sm font-bold mb-1">Identify Heritage Site</p>
               <p className="text-white/60 text-xs mb-4">Tap to take a photo or upload an image from gallery</p>
               <button
                 onClick={() => fileInputRef.current?.click()}
-                className="bg-[#2C3E8F] text-white text-xs font-bold px-5 py-3 rounded-2xl shadow-lg w-full"
+                className="bg-[#23351F] text-white text-xs font-bold px-5 py-3 rounded-2xl shadow-lg w-full"
               >
                 Upload / Take Photo
               </button>
@@ -897,7 +895,7 @@ function CameraScreen({ onScan, onBack, onFileSelect }: { onScan: () => void; on
         <button onClick={onBack} className="w-10 h-10 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center">
           <ArrowLeft size={18} className="text-white" />
         </button>
-        <div className="bg-black/40 backdrop-blur-md rounded-full px-4 py-2">
+        <div className="bg-black/40 backdrop-blur-md rounded-full px-4 py-2 border border-white/10">
           <p className="text-white text-xs font-semibold">Point at a heritage site</p>
         </div>
         <button onClick={() => fileInputRef.current?.click()} className="w-10 h-10 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center">
@@ -913,10 +911,10 @@ function CameraScreen({ onScan, onBack, onFileSelect }: { onScan: () => void; on
             ["bottom-0 left-0 border-b-2 border-l-2", "rounded-bl-2xl"],
             ["bottom-0 right-0 border-b-2 border-r-2", "rounded-br-2xl"]
           ].map(([pos, round], i) => (
-            <div key={i} className={`absolute w-10 h-10 border-[#D4A017] ${pos} ${round}`} />
+            <div key={i} className={`absolute w-10 h-10 border-[#69A20D] ${pos} ${round}`} />
           ))}
           <motion.div
-            className="absolute left-2 right-2 h-0.5 bg-gradient-to-r from-transparent via-[#D4A017] to-transparent"
+            className="absolute left-2 right-2 h-0.5 bg-gradient-to-r from-transparent via-[#69A20D] to-transparent"
             animate={{ top: ["10%", "90%", "10%"] }}
             transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
           />
@@ -939,10 +937,10 @@ function CameraScreen({ onScan, onBack, onFileSelect }: { onScan: () => void; on
           <motion.button whileTap={{ scale: 0.9 }}
             onClick={handleShutter}
             className="w-20 h-20 rounded-full bg-white flex items-center justify-center shadow-2xl relative">
-            <div className="w-16 h-16 rounded-full bg-[#2C3E8F] flex items-center justify-center">
+            <div className="w-16 h-16 rounded-full bg-[#23351F] flex items-center justify-center">
               <Camera size={28} className="text-white" />
             </div>
-            {scanning && <motion.div className="absolute inset-0 rounded-full border-2 border-[#D4A017]"
+            {scanning && <motion.div className="absolute inset-0 rounded-full border-2 border-[#69A20D]"
               animate={{ scale: [1, 1.3], opacity: [1, 0] }} transition={{ duration: 0.6, repeat: Infinity }} />}
           </motion.button>
 
@@ -965,7 +963,6 @@ function ScanningScreen({ onDone, imageFile, onRecognitionResult }: { onDone: ()
   const [stepIdx, setStepIdx] = useState(0);
   const recognitionStarted = useRef(false);
 
-  // Start real recognition
   useEffect(() => {
     if (!imageFile || recognitionStarted.current) return;
     recognitionStarted.current = true;
@@ -979,7 +976,6 @@ function ScanningScreen({ onDone, imageFile, onRecognitionResult }: { onDone: ()
       });
   }, [imageFile, onRecognitionResult]);
 
-  // Progress animation
   useEffect(() => {
     const interval = setInterval(() => {
       setProgress(p => {
@@ -990,9 +986,10 @@ function ScanningScreen({ onDone, imageFile, onRecognitionResult }: { onDone: ()
     }, 50);
     return () => clearInterval(interval);
   }, [onDone, progress]);
+
   return (
     <div className="h-full min-h-full flex-1 flex flex-col items-center justify-center relative overflow-hidden"
-      style={{ background: "linear-gradient(160deg, #23351F 0%, #354f2f 60%, #172514 100%)" }}>
+      style={{ background: "linear-gradient(160deg, #23351F 0%, #2e4429 60%, #172514 100%)" }}>
       {[...Array(6)].map((_, i) => (
         <motion.div key={i} className="absolute rounded-full border border-[#69A20D]/20"
           style={{ width: 100 + i * 60, height: 100 + i * 60 }}
@@ -1093,7 +1090,7 @@ function ResultScreen({ onNav, onBack, recognitionResult, recognitionError, onSe
           <span className="text-[#5F6B5E] text-sm font-medium">{location}</span>
         </div>
         {/* AI summary with Audio Narration */}
-        <div className="bg-white/90 backdrop-blur-md rounded-3xl p-4 mb-5 border border-[#E4E7EB] shadow-xs">
+        <div className="bg-white rounded-3xl p-4 mb-5 border border-[#E4E7EB] shadow-[0_4px_20px_rgba(35,53,31,0.03)]">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
               <MascotSVG size={28} />
@@ -1116,14 +1113,14 @@ function ResultScreen({ onNav, onBack, recognitionResult, recognitionError, onSe
         </div>
         {/* All scores */}
         {recognitionResult?.allScores && recognitionResult.allScores.length > 0 && (
-          <div className="mb-5 bg-white p-4 rounded-3xl border border-[#E4E7EB]">
+          <div className="mb-5 bg-white p-4 rounded-3xl border border-[#E4E7EB] shadow-xs">
             <p className="text-[#222E1C] text-xs font-black mb-2">Recognition Confidence Scores</p>
             <div className="flex flex-col gap-2">
               {recognitionResult.allScores.map(([name, score]) => (
                 <div key={name} className="flex items-center gap-2">
                   <span className="text-[#222E1C] text-xs font-bold flex-1">{name}</span>
                   <div className="w-24">
-                    <ProgressBar value={score * 100} color={name === siteName ? '#69A20D' : '#A7B1A7'} />
+                    <ProgressBar value={score * 100} color={name === siteName ? '#69A20D' : '#94A3B8'} />
                   </div>
                   <span className="text-[#5F6B5E] text-[10px] w-10 text-right font-semibold">{(score * 100).toFixed(1)}%</span>
                 </div>
@@ -1208,7 +1205,7 @@ function DetailsScreen({ onNav, onBack, selectedSite }: { onNav: (s: Screen) => 
           <h1 className="text-2xl font-black text-[#222E1C] mb-1 font-display">{displayName}</h1>
           <div className="flex items-center gap-3 mb-4">
             <div className="flex items-center gap-1"><Star size={12} className="text-[#69A20D] fill-[#69A20D]" /><span className="text-sm font-bold text-[#222E1C]">4.8</span></div>
-            <span className="text-[#A7B1A7] text-xs">·</span>
+            <span className="text-[#94A3B8] text-xs">·</span>
             <div className="flex items-center gap-1"><MapPin size={12} className="text-[#69A20D]" /><span className="text-[#5F6B5E] text-xs font-medium">{displayLocation}</span></div>
           </div>
           <div className="flex gap-2 overflow-x-auto scrollbar-hide mb-5">
@@ -1270,11 +1267,11 @@ function StoryScreen({ onBack, selectedSite, onNav }: { onBack: () => void; sele
   const paragraphs = storyData?.narrative?.split('\n\n').filter(Boolean) || [];
 
   return (
-    <div className="flex flex-col bg-[#0D1A0D] min-h-full flex-1 overflow-y-auto">
+    <div className="flex flex-col bg-[#172514] min-h-full flex-1 overflow-y-auto">
       {/* Hero Image — full bleed */}
       <div className="relative w-full" style={{ height: 320 }}>
         <img src={getSiteImage(selectedSite)} alt={selectedSite} className="w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0D1A0D] via-[#0D1A0D]/40 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#172514] via-[#172514]/40 to-transparent" />
         {/* Back button */}
         <button onClick={onBack}
           className="absolute top-12 left-5 w-9 h-9 rounded-full bg-black/40 backdrop-blur-md border border-white/20 flex items-center justify-center text-white z-10">
@@ -1342,7 +1339,7 @@ function StoryScreen({ onBack, selectedSite, onNav }: { onBack: () => void; sele
             {/* Chapters tab selector */}
             {(storyData as any).chapters?.length > 0 && (
               <div className="mb-5">
-                <p className="text-[#5F6B5E] text-[9px] font-black uppercase tracking-widest mb-2">Story Chapters</p>
+                <p className="text-white/50 text-[9px] font-black uppercase tracking-widest mb-2">Story Chapters</p>
                 <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
                   {(storyData as any).chapters.map((ch: { title: string; body: string }, i: number) => (
                     <button key={i} onClick={() => setActiveChapter(i)}
@@ -1374,10 +1371,10 @@ function StoryScreen({ onBack, selectedSite, onNav }: { onBack: () => void; sele
 
             {/* Full Narrative — multi-paragraph */}
             <div className="mb-6">
-              <p className="text-[#5F6B5E] text-[9px] font-black uppercase tracking-widest mb-3">The Full Story</p>
+              <p className="text-white/50 text-[9px] font-black uppercase tracking-widest mb-3">The Full Story</p>
               <div className="flex flex-col gap-4">
                 {paragraphs.map((para, i) => (
-                  <p key={i} className={`leading-7 ${i === 0 ? 'text-white text-sm font-medium' : 'text-white/65 text-sm'}`}>
+                  <p key={i} className={`leading-7 ${i === 0 ? 'text-white text-sm font-medium' : 'text-white/70 text-sm'}`}>
                     {i === 0 && (
                       <span className="float-left text-[#69A20D] text-5xl font-black leading-none mr-2 mt-1 font-display">
                         {para[0]}
@@ -1401,7 +1398,7 @@ function StoryScreen({ onBack, selectedSite, onNav }: { onBack: () => void; sele
             {/* Historical Highlights */}
             {storyData.highlights?.length > 0 && (
               <div className="mb-6">
-                <p className="text-[#5F6B5E] text-[9px] font-black uppercase tracking-widest mb-3">Key Highlights</p>
+                <p className="text-white/50 text-[9px] font-black uppercase tracking-widest mb-3">Key Highlights</p>
                 <div className="flex flex-col gap-2">
                   {storyData.highlights.map((h, i) => (
                     <div key={i} className="flex items-start gap-3 bg-white/5 border border-white/10 rounded-2xl p-3.5">
@@ -1418,7 +1415,7 @@ function StoryScreen({ onBack, selectedSite, onNav }: { onBack: () => void; sele
             {/* Topic Tags */}
             {(storyData as any).tags?.length > 0 && (
               <div className="mb-6">
-                <p className="text-[#5F6B5E] text-[9px] font-black uppercase tracking-widest mb-2">Topics</p>
+                <p className="text-white/50 text-[9px] font-black uppercase tracking-widest mb-2">Topics</p>
                 <div className="flex flex-wrap gap-2">
                   {(storyData as any).tags.map((tag: string) => (
                     <span key={tag}
@@ -1431,7 +1428,7 @@ function StoryScreen({ onBack, selectedSite, onNav }: { onBack: () => void; sele
             )}
 
             {/* Source + date */}
-            <p className="text-white/25 text-[10px] text-center mb-5 font-medium">
+            <p className="text-white/30 text-[10px] text-center mb-5 font-medium">
               {storyData.source} · {new Date(storyData.generatedAt || Date.now()).toLocaleDateString('en-US', { year: 'numeric', month: 'long' })}
             </p>
 
@@ -1456,7 +1453,6 @@ function StoryScreen({ onBack, selectedSite, onNav }: { onBack: () => void; sele
     </div>
   );
 }
-
 
 function AudioGuideScreen({ onBack, selectedSite }: { onBack: () => void; selectedSite: string }) {
   const [playing, setPlaying] = useState(false);
@@ -1532,13 +1528,11 @@ function AudioGuideScreen({ onBack, selectedSite }: { onBack: () => void; select
 
       let chosenVoice: SpeechSynthesisVoice | undefined;
 
-      // Try priority list first
       for (const name of cutePriority) {
         chosenVoice = voices.find(v => v.name.includes(name) && v.lang.startsWith('en'));
         if (chosenVoice) break;
       }
 
-      // Fallback: any English female-sounding voice
       if (!chosenVoice) {
         chosenVoice = voices.find(v => v.lang.startsWith('en') && (
           v.name.toLowerCase().includes('female') ||
@@ -1547,7 +1541,6 @@ function AudioGuideScreen({ onBack, selectedSite }: { onBack: () => void; select
         ));
       }
 
-      // Final fallback: first available English voice
       if (!chosenVoice) {
         chosenVoice = voices.find(v => v.lang.startsWith('en'));
       }
@@ -1570,7 +1563,6 @@ function AudioGuideScreen({ onBack, selectedSite }: { onBack: () => void; select
       setPlaying(true);
     };
 
-    // Voices may not be loaded yet on mobile — wait for them
     const voices = window.speechSynthesis.getVoices();
     if (voices.length > 0) {
       doSpeak();
@@ -1655,7 +1647,7 @@ function AudioGuideScreen({ onBack, selectedSite }: { onBack: () => void; select
           setPlaying(true);
         } else {
           const lastAraMessage = [...chatHistory].reverse().find(m => m.sender === 'ara');
-          speakText(lastAraMessage?.text || narrative, rate);
+          speakText(lastAraMessage?.text || (storyData?.narrative || 'Welcome to the audio guide.'), rate);
         }
       }
     }
@@ -1666,7 +1658,7 @@ function AudioGuideScreen({ onBack, selectedSite }: { onBack: () => void; select
     setRate(nextRate);
     if (playing) {
       const lastAraMessage = [...chatHistory].reverse().find(m => m.sender === 'ara');
-      speakText(lastAraMessage?.text || narrative, nextRate);
+      speakText(lastAraMessage?.text || (storyData?.narrative || 'Welcome to the audio guide.'), nextRate);
     }
   };
 
@@ -1708,66 +1700,57 @@ function AudioGuideScreen({ onBack, selectedSite }: { onBack: () => void; select
         </div>
       </div>
 
-      {/* Guide Hero & Voice Status */}
-      <div className="mx-5 my-3 bg-white rounded-3xl p-4 border border-[#E4E7EB] shadow-xs flex items-center gap-4 relative overflow-hidden">
-        <div className="relative">
-          <MascotSVG size={54} animate={playing || isListening} />
-          {playing && (
-            <span className="absolute -bottom-1 -right-1 w-4 h-4 bg-[#69A20D] rounded-full border-2 border-white flex items-center justify-center">
-              <span className="w-1.5 h-1.5 bg-white rounded-full animate-ping" />
-            </span>
-          )}
-        </div>
-        <div className="flex-1">
-          <div className="flex items-center gap-1.5 mb-1">
-            <h2 className="text-[#222E1C] font-black text-sm font-display">{selectedSite || "Heritage Site"}</h2>
-            <Badge label="Ara Guide" color="sand" />
+      {/* Guide Header Banner */}
+      <div className="px-5 pt-4 pb-2 bg-gradient-to-b from-[#EAF6DD]/70 via-[#F7F9F6] to-[#F7F9F6] border-b border-[#E4E7EB]/60">
+        <div className="flex items-center gap-3">
+          <div className="relative">
+            <MascotSVG size={44} animate={playing || isThinking} />
+            <div className={`absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full border-2 border-white ${playing ? "bg-[#69A20D]" : "bg-emerald-400"}`} />
           </div>
-          <p className="text-[#5F6B5E] text-xs font-medium leading-tight">
-            {isListening ? "🎙️ Ara is listening..." : playing ? "🗣️ Ara is speaking..." : isThinking ? "🧠 Ara is thinking..." : "Ask Ara anything aloud or type below!"}
-          </p>
-
-          {/* Animated Waveform */}
-          <div className="flex items-center gap-1 h-4 mt-2">
-            {[0.4, 0.9, 0.5, 0.7, 1.0, 0.6, 0.8, 0.4, 0.9, 0.5].map((h, i) => (
-              <motion.div
-                key={i}
-                className={`w-1 rounded-full ${playing ? 'bg-[#69A20D]' : isListening ? 'bg-red-500' : 'bg-[#E4E7EB]'}`}
-                animate={playing || isListening ? { height: ["20%", `${h * 100}%`, "20%"] } : { height: "20%" }}
-                transition={{ duration: 0.6, repeat: Infinity, delay: i * 0.06 }}
-              />
-            ))}
+          <div className="flex-1">
+            <div className="flex items-center gap-1.5 mb-0.5">
+              <h2 className="text-[#222E1C] font-black text-sm font-display">{selectedSite || "Heritage Site"}</h2>
+              <Badge label="Ara Guide" color="sand" />
+            </div>
+            <p className="text-[#5F6B5E] text-xs font-medium leading-tight">
+              {isListening ? "🎙️ Ara is listening..." : playing ? "🗣️ Ara is speaking..." : isThinking ? "🧠 Ara is thinking..." : "Ask Ara anything aloud or type below!"}
+            </p>
           </div>
         </div>
 
-        {/* Play Pause Button */}
-        <button
-          onClick={togglePlay}
-          className="w-11 h-11 rounded-2xl bg-[#23351F] text-white flex items-center justify-center shadow-md hover:bg-[#172514] transition-all flex-shrink-0"
-        >
-          {playing ? <Pause size={20} /> : <Play size={20} className="ml-0.5 fill-white" />}
-        </button>
+        {/* Play control strip */}
+        <div className="mt-3 bg-white rounded-2xl p-3 border border-[#E4E7EB] shadow-xs flex items-center gap-3">
+          <button onClick={togglePlay} className="w-10 h-10 rounded-xl bg-[#23351F] text-white flex items-center justify-center shadow-sm">
+            {playing ? <Pause size={18} /> : <Play size={18} className="ml-0.5" />}
+          </button>
+          <div className="flex-1 min-w-0">
+            <p className="text-[#222E1C] text-xs font-bold truncate">{siteTitle}</p>
+            <div className="mt-1">
+              <ProgressBar value={progress} color="#69A20D" />
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* Interactive Dialogue History */}
-      <div className="px-5 flex-1 overflow-y-auto max-h-[380px] scrollbar-hide py-2 flex flex-col gap-3">
+      {/* Interactive Chat Stream */}
+      <div className="flex-1 overflow-y-auto px-5 py-4 flex flex-col gap-3">
         {chatHistory.map((msg, idx) => (
           <motion.div
             key={idx}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ y: 10, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
             className={`flex items-start gap-2.5 ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
           >
             {msg.sender === 'ara' && (
-              <div className="w-8 h-8 rounded-full bg-[#EAF6DD] border border-[#CAE5B1] flex items-center justify-center flex-shrink-0 mt-1">
+              <div className="w-8 h-8 rounded-full bg-[#EAF6DD] border border-[#CAE5B1] flex items-center justify-center flex-shrink-0 mt-1 shadow-xs">
                 <MascotSVG size={22} />
               </div>
             )}
             <div
-              className={`max-w-[80%] rounded-3xl p-3.5 text-xs leading-relaxed font-medium shadow-xs ${
+              className={`max-w-[82%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
                 msg.sender === 'user'
-                  ? 'bg-[#23351F] text-white rounded-tr-xs'
-                  : 'bg-white text-[#222E1C] border border-[#E4E7EB] rounded-tl-xs'
+                  ? 'bg-[#23351F] text-white rounded-tr-xs shadow-xs'
+                  : 'bg-white text-[#222E1C] border border-[#E4E7EB] shadow-xs rounded-tl-xs'
               }`}
             >
               {msg.text}
@@ -1776,62 +1759,59 @@ function AudioGuideScreen({ onBack, selectedSite }: { onBack: () => void; select
         ))}
 
         {isThinking && (
-          <div className="flex items-center gap-2 text-[#5F6B5E] text-xs py-2 bg-white rounded-2xl p-3 border border-[#E4E7EB] max-w-[60%]">
+          <div className="flex items-center gap-2 text-[#5F6B5E] text-xs font-medium italic py-2 px-3 bg-white/70 rounded-2xl border border-[#E4E7EB] w-max">
             <Loader2 size={14} className="animate-spin text-[#69A20D]" />
-            <span>Ara is consulting history...</span>
+            Ara is gathering knowledge...
           </div>
         )}
+
         <div ref={chatEndRef} />
       </div>
 
-      {/* Interactive Suggestion Chips */}
-      <div className="px-5 my-2">
-        <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
-          {suggestions.map(s => (
-            <button
-              key={s}
-              onClick={() => handleSendMessage(s)}
-              className="bg-white border border-[#CAE5B1] text-[#23351F] text-[11px] font-bold px-3 py-1.5 rounded-full whitespace-nowrap shadow-xs hover:bg-[#EAF6DD] transition-all flex items-center gap-1"
-            >
-              <Sparkles size={10} className="text-[#69A20D]" />
-              <span>{s}</span>
-            </button>
-          ))}
-        </div>
+      {/* Suggested Quick Questions */}
+      <div className="px-5 py-2 overflow-x-auto scrollbar-hide flex gap-2">
+        {suggestions.map((s, i) => (
+          <button
+            key={i}
+            onClick={() => handleSendMessage(s)}
+            className="flex-shrink-0 bg-white border border-[#E4E7EB] hover:border-[#69A20D] text-[#5F6B5E] text-xs font-bold px-3 py-1.5 rounded-full shadow-xs transition-all"
+          >
+            💬 {s}
+          </button>
+        ))}
       </div>
 
-      {/* Voice & Input Action Bar */}
-      <div className="p-4 bg-white border-t border-[#E4E7EB]">
+      {/* Interactive Speech & Text Bar */}
+      <div className="p-4 bg-white border-t border-[#E4E7EB] shadow-md z-10">
         <div className="flex items-center gap-2">
-          {/* Push-to-Talk Mic Button */}
-          <motion.button
-            whileTap={{ scale: 0.92 }}
+          <button
             onClick={toggleListening}
-            className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-md transition-all ${
-              isListening ? 'bg-red-500 text-white animate-pulse' : 'bg-[#EAF6DD] text-[#23351F] border border-[#CAE5B1]'
+            className={`w-11 h-11 rounded-2xl flex items-center justify-center transition-all ${
+              isListening
+                ? 'bg-red-500 text-white animate-pulse shadow-md'
+                : 'bg-[#EAF6DD] text-[#23351F] border border-[#CAE5B1]'
             }`}
+            title="Voice input"
           >
             {isListening ? <MicOff size={20} /> : <Mic size={20} className="text-[#69A20D]" />}
-          </motion.button>
+          </button>
 
-          {/* Text Input */}
-          <div className="flex-1 flex items-center gap-2 bg-[#EEF1F3] rounded-2xl px-4 py-2.5 border border-[#E4E7EB] focus-within:border-[#69A20D]">
-            <input
-              type="text"
-              placeholder={isListening ? "Listening to your voice..." : "Ask Ara about this site..."}
-              value={inputQuery}
-              onChange={e => setInputQuery(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && handleSendMessage()}
-              className="flex-1 text-xs text-[#222E1C] placeholder-[#A7B1A7] bg-transparent outline-none font-medium"
-            />
-            <button
-              onClick={() => handleSendMessage()}
-              disabled={!inputQuery.trim() || isThinking}
-              className="w-8 h-8 rounded-xl bg-[#23351F] text-white flex items-center justify-center disabled:opacity-30 hover:bg-[#172514] transition-all"
-            >
-              <Send size={14} />
-            </button>
-          </div>
+          <input
+            type="text"
+            value={inputQuery}
+            onChange={(e) => setInputQuery(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
+            placeholder={isListening ? "Listening now..." : "Ask Ara about this site..."}
+            className="flex-1 bg-[#EEF1F3] border border-[#E4E7EB] focus:border-[#69A20D] rounded-2xl px-4 py-3 text-sm text-[#222E1C] placeholder-[#94A3B8] outline-none transition-all font-medium"
+          />
+
+          <button
+            onClick={() => handleSendMessage()}
+            disabled={!inputQuery.trim() || isThinking}
+            className="w-11 h-11 rounded-2xl bg-[#23351F] text-white flex items-center justify-center disabled:opacity-40 transition-all shadow-sm"
+          >
+            <Send size={18} />
+          </button>
         </div>
       </div>
     </div>
@@ -1897,7 +1877,7 @@ function MapScreen({ onNav, onBack, onSelectSite }: { onNav: (s: Screen) => void
       L.control.zoom({ position: 'bottomright' }).addTo(map);
 
       markersRef.current = [];
-      heritagePlaces.forEach((place, index) => {
+      heritagePlaces.forEach((place) => {
         const col = categoryColors[place.category] || '#23351F';
         const customIcon = L.divIcon({
           className: '',
@@ -1968,7 +1948,7 @@ function MapScreen({ onNav, onBack, onSelectSite }: { onNav: (s: Screen) => void
           <ArrowLeft size={18} />
         </button>
         <div className="flex-1">
-          <span className="text-[#222E1C] text-base font-black font-display block">Heritage Map</span>
+          <span className="text-[#222E1C] text-base font-black font-display block leading-tight">Heritage Map</span>
           <span className="text-[#5F6B5E] text-[10px] font-medium">{heritagePlaces.length} sites · Nepal</span>
         </div>
         <button onClick={handleNearMe} disabled={locating}
@@ -2017,7 +1997,6 @@ function MapScreen({ onNav, onBack, onSelectSite }: { onNav: (s: Screen) => void
       <div className="px-5 mb-3">
         <motion.div key={selectedPlace.name} initial={{ y: 10, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
           className="bg-white rounded-3xl border border-[#E4E7EB] shadow-sm overflow-hidden">
-          {/* Top section */}
           <div className="flex items-start gap-3 p-4 pb-3">
             <div className="w-16 h-16 rounded-2xl bg-[#EEF1F3] overflow-hidden flex-shrink-0">
               <img src={getSiteImage(selectedPlace.name)} alt={selectedPlace.name} className="w-full h-full object-cover" />
@@ -2035,44 +2014,41 @@ function MapScreen({ onNav, onBack, onSelectSite }: { onNav: (s: Screen) => void
                   <Star size={10} className="text-amber-400 fill-amber-400" />
                   <span className="text-xs font-bold text-[#222E1C]">{selectedPlace.rating}</span>
                 </div>
-                <span className="text-[#A7B1A7] text-xs">·</span>
+                <span className="text-[#94A3B8] text-xs">·</span>
                 <span className="text-[#5F6B5E] text-xs font-medium">{selectedPlace.tips} tips</span>
-                <span className="text-[#A7B1A7] text-xs">·</span>
+                <span className="text-[#94A3B8] text-xs">·</span>
                 <MapPin size={9} className="text-[#69A20D]" />
                 <span className="text-[#5F6B5E] text-[10px] font-medium truncate">{selectedPlace.location}</span>
               </div>
             </div>
           </div>
 
-          {/* Tourist Info Grid */}
           <div className="grid grid-cols-3 gap-0 border-t border-[#F0F2F0] mx-4 mb-3">
             <div className="flex flex-col items-center py-2.5 border-r border-[#F0F2F0]">
               <Clock size={12} className="text-[#69A20D] mb-1" />
               <p className="text-[10px] font-black text-[#222E1C]">{selectedPlace.hours}</p>
-              <p className="text-[9px] text-[#A7B1A7] font-medium">Hours</p>
+              <p className="text-[9px] text-[#94A3B8] font-medium">Hours</p>
             </div>
             <div className="flex flex-col items-center py-2.5 border-r border-[#F0F2F0]">
               <span className="text-xs mb-1">🎟️</span>
               <p className="text-[10px] font-black text-[#222E1C]">{selectedPlace.fee}</p>
-              <p className="text-[9px] text-[#A7B1A7] font-medium">Entry Fee</p>
+              <p className="text-[9px] text-[#94A3B8] font-medium">Entry Fee</p>
             </div>
             <div className="flex flex-col items-center py-2.5">
               <Sun size={12} className="text-amber-400 mb-1" />
               <p className="text-[10px] font-black text-[#222E1C]">{selectedPlace.bestTime}</p>
-              <p className="text-[9px] text-[#A7B1A7] font-medium">Best Time</p>
+              <p className="text-[9px] text-[#94A3B8] font-medium">Best Time</p>
             </div>
           </div>
 
-          {/* Must-See Tip */}
           <div className="mx-4 mb-3 bg-[#EAF6DD] rounded-2xl px-3 py-2 flex items-center gap-2 border border-[#CAE5B1]">
             <Star size={12} className="text-[#69A20D] flex-shrink-0" />
             <p className="text-[10px] text-[#23351F] font-bold">Must-see: <span className="font-medium">{selectedPlace.mustSee}</span></p>
           </div>
 
-          {/* Action buttons */}
           <div className="flex gap-2 px-4 pb-4">
             <button onClick={() => handleDirections(selectedPlace)}
-              className="flex-1 flex items-center justify-center gap-1.5 bg-[#23351F] text-white text-xs font-bold py-2.5 rounded-2xl">
+              className="flex-1 flex items-center justify-center gap-1.5 bg-[#23351F] text-white text-xs font-bold py-2.5 rounded-2xl shadow-sm">
               <Navigation size={12} />
               Get Directions
             </button>
@@ -2120,7 +2096,7 @@ function MapScreen({ onNav, onBack, onSelectSite }: { onNav: (s: Screen) => void
                     <Star size={9} className="text-amber-400 fill-amber-400" />
                     <span className="text-[10px] font-bold text-[#222E1C]">{p.rating}</span>
                   </div>
-                  <MapPin size={13} className={isSelected ? "text-[#69A20D]" : "text-[#A7B1A7]"} />
+                  <MapPin size={13} className={isSelected ? "text-[#69A20D]" : "text-[#94A3B8]"} />
                 </div>
               </button>
             );
@@ -2161,14 +2137,14 @@ function ExploreScreen({ onNav, onSelectSite }: { onNav: (s: Screen) => void; on
     <div className="flex flex-col bg-[#F7F9F6] min-h-full flex-1">
       <div className="px-5 pt-12 sm:pt-14 pb-3">
         <h1 className="text-2xl font-black text-[#222E1C] mb-1 font-display">Explore Heritage</h1>
-        <p className="text-[#5F6B5E] text-sm">Discover World Heritage sites and ancient legends</p>
+        <p className="text-[#5F6B5E] text-sm font-medium">Discover World Heritage sites and ancient legends</p>
       </div>
       {/* Hero banner */}
-      <div className="mx-5 rounded-3xl overflow-hidden h-36 relative mb-5 bg-[#23351F] shadow-md">
+      <div className="mx-5 rounded-3xl overflow-hidden h-36 relative mb-5 bg-[#23351F] shadow-sm">
         <img src="https://images.unsplash.com/photo-1781079974741-0635e52ef4c3?w=400&h=150&fit=crop" alt="explore" className="w-full h-full object-cover opacity-60" />
         <div className="absolute inset-0 bg-gradient-to-r from-[#23351F]/90 via-[#23351F]/40 to-transparent" />
         <div className="absolute left-5 top-5">
-          <p className="text-[#CAE5B1] text-xs font-semibold uppercase tracking-wider">Featured UNESCO Collection</p>
+          <p className="text-[#CAE5B1] text-xs font-bold uppercase tracking-wider">Featured UNESCO Collection</p>
           <h3 className="text-white text-base font-black font-display">Sacred Asian Temples</h3>
           <div className="mt-2">
             <Badge label="32 UNESCO Sites" color="gold" />
@@ -2183,12 +2159,12 @@ function ExploreScreen({ onNav, onSelectSite }: { onNav: (s: Screen) => void; on
       <div className="px-5 grid grid-cols-2 gap-3 mb-6">
         {sites.map(s => (
           <motion.button key={s.name} whileTap={{ scale: 0.97 }} onClick={() => { onSelectSite(s.name); onNav("details"); }}
-            className="bg-white rounded-3xl overflow-hidden border border-[#E4E7EB] text-left shadow-xs hover:shadow-md transition-all group">
+            className="bg-white rounded-3xl overflow-hidden border border-[#E4E7EB] text-left shadow-xs hover:shadow-md transition-all duration-300 group">
             <div className="h-28 bg-[#EEF1F3] relative">
               <img src={s.img} alt={s.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
               <div className="absolute bottom-2 left-2 right-2 flex justify-between items-end">
-                <div className="flex items-center gap-1 bg-white/80 backdrop-blur-md rounded-full px-2 py-0.5">
+                <div className="flex items-center gap-1 bg-white/90 backdrop-blur-md rounded-full px-2 py-0.5 border border-white/60">
                   <Star size={9} className="text-[#69A20D] fill-[#69A20D]" />
                   <span className="text-[#222E1C] text-[9px] font-bold">{s.r}</span>
                 </div>
@@ -2234,7 +2210,7 @@ function SearchScreen({ onBack, onSelectSite, onNav }: { onBack: () => void; onS
           </button>
           <div className="flex-1 flex items-center gap-2 bg-white border border-[#E4E7EB] rounded-2xl px-4 py-3 shadow-xs focus-within:border-[#69A20D]">
             <Search size={16} className="text-[#69A20D]" />
-            <input autoFocus className="flex-1 text-sm text-[#222E1C] placeholder-[#A7B1A7] bg-transparent outline-none font-medium"
+            <input autoFocus className="flex-1 text-sm text-[#222E1C] placeholder-[#94A3B8] bg-transparent outline-none font-medium"
               placeholder="Search sites, stories, cities..." value={query} onChange={e => setQuery(e.target.value)} />
             {query && <button onClick={() => setQuery("")}><X size={14} className="text-[#5F6B5E]" /></button>}
           </div>
@@ -2332,7 +2308,7 @@ function SavedScreen({ onNav }: { onNav: (s: Screen) => void }) {
                 <h3 className="text-[#222E1C] font-black text-base font-display">{s.name}</h3>
                 <div className="flex items-center justify-between mt-1">
                   <div className="flex items-center gap-1"><MapPin size={11} className="text-[#69A20D]" /><span className="text-[#5F6B5E] text-xs font-medium">{s.loc}</span></div>
-                  <span className="text-[#A7B1A7] text-[10px] font-semibold">{s.date}</span>
+                  <span className="text-[#94A3B8] text-[10px] font-semibold">{s.date}</span>
                 </div>
               </div>
             </motion.button>
@@ -2399,7 +2375,7 @@ function AchievementsScreen({ onBack }: { onBack: () => void }) {
       <NavBar title="Travel Passport" onBack={onBack} />
       {/* Passport cover */}
       <div className="mx-5 rounded-3xl p-5 mb-5 relative overflow-hidden shadow-lg"
-        style={{ background: "linear-gradient(135deg, #23351F 0%, #354f2f 60%, #172514 100%)" }}>
+        style={{ background: "linear-gradient(135deg, #23351F 0%, #2e4429 60%, #172514 100%)" }}>
         <div className="absolute top-0 right-0 w-32 h-32 rounded-full bg-white/5" style={{ transform: "translate(30%, -30%)" }} />
         <div className="absolute bottom-0 left-0 w-20 h-20 rounded-full bg-[#69A20D]/20" style={{ transform: "translate(-30%, 30%)" }} />
         <div className="relative z-10 flex items-center gap-3 mb-4">
@@ -2433,8 +2409,8 @@ function AchievementsScreen({ onBack }: { onBack: () => void }) {
           {stamps.map(s => (
             <div key={s.name} className={`rounded-2xl p-4 flex flex-col items-center gap-2 border ${s.earned ? "bg-white border-[#CAE5B1]" : "bg-[#EEF1F3] border-[#E4E7EB]"}`}>
               <div className={`text-3xl ${!s.earned ? "opacity-30 grayscale" : ""}`}>{s.icon}</div>
-              <p className={`text-[10px] font-bold text-center leading-tight ${s.earned ? "text-[#222E1C]" : "text-[#A7B1A7]"}`}>{s.name}</p>
-              {s.earned ? <Badge label={s.date!} color="gold" /> : <span className="text-[9px] text-[#A7B1A7] font-semibold">Locked</span>}
+              <p className={`text-[10px] font-bold text-center leading-tight ${s.earned ? "text-[#222E1C]" : "text-[#94A3B8]"}`}>{s.name}</p>
+              {s.earned ? <Badge label={s.date!} color="gold" /> : <span className="text-[9px] text-[#94A3B8] font-semibold">Locked</span>}
             </div>
           ))}
         </div>
@@ -2466,7 +2442,7 @@ function NotificationsScreen({ onBack }: { onBack: () => void }) {
                 {!n.read && <div className="w-2 h-2 rounded-full bg-[#69A20D] flex-shrink-0 mt-1" />}
               </div>
               <p className="text-[#5F6B5E] text-xs mt-0.5 leading-relaxed">{n.body}</p>
-              <p className="text-[#A7B1A7] text-[10px] mt-1 font-semibold">{n.time}</p>
+              <p className="text-[#94A3B8] text-[10px] mt-1 font-semibold">{n.time}</p>
             </div>
           </div>
         ))}
@@ -2489,7 +2465,7 @@ function ProfileScreen({ onNav }: { onNav: (s: Screen) => void }) {
         </button>
       </div>
       {/* Profile card */}
-      <div className="mx-5 my-4 rounded-3xl overflow-hidden shadow-md" style={{ background: "linear-gradient(135deg, #23351F 0%, #354f2f 60%, #172514 100%)" }}>
+      <div className="mx-5 my-4 rounded-3xl overflow-hidden shadow-md" style={{ background: "linear-gradient(135deg, #23351F 0%, #2e4429 60%, #172514 100%)" }}>
         <div className="p-5">
           <div className="flex items-center gap-4 mb-4">
             <div className="relative">
@@ -2770,9 +2746,9 @@ export default function App() {
       case "scanning": return <ScanningScreen onDone={() => nav("result")} imageFile={imageFile} onRecognitionResult={handleRecognitionResult} />;
       case "result": return <ResultScreen onNav={nav} onBack={back} recognitionResult={recognitionResult} recognitionError={recognitionError} onSelectSite={handleSelectSite} />;
       case "details": return <DetailsScreen onNav={nav} onBack={back} selectedSite={selectedSite} />;
-      case "story": return <StoryScreen onBack={back} selectedSite={selectedSite} />;
+      case "story": return <StoryScreen onBack={back} selectedSite={selectedSite} onNav={nav} />;
       case "audio": return <AudioGuideScreen onBack={back} selectedSite={selectedSite} />;
-      case "map": return <MapScreen onNav={nav} onBack={back} />;
+      case "map": return <MapScreen onNav={nav} onBack={back} onSelectSite={handleSelectSite} />;
       case "explore": return <ExploreScreen onNav={nav} onSelectSite={handleSelectSite} />;
       case "search": return <SearchScreen onBack={back} onSelectSite={handleSelectSite} onNav={nav} />;
       case "saved": return <SavedScreen onNav={nav} />;
@@ -2784,20 +2760,29 @@ export default function App() {
       case "language": return <LanguageScreen onBack={back} />;
       case "offline": return <OfflineScreen onBack={back} />;
       case "error": return <ErrorScreen onBack={back} />;
-      default: return <ErrorScreen onBack={back} />;
+      default: return <HomeScreen onNav={nav} onScan={() => nav("camera")} onSelectSite={handleSelectSite} />;
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#FFFDF8] sm:bg-gradient-to-br sm:from-[#1a2a6c] sm:via-[#2C3E8F] sm:to-[#0d1b4a] flex flex-col items-center justify-center p-0 sm:p-4 md:p-6">
+    <div className="w-full min-h-screen bg-[#111A10] flex flex-col items-center justify-center font-sans antialiased text-[#222E1C] selection:bg-[#CAE5B1] selection:text-[#23351F]">
       <PhoneFrame>
-        <AnimatePresence mode="wait">
-          <motion.div key={active} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }}
-            transition={{ duration: 0.25 }} className="min-h-full flex flex-col">
-            {renderScreen()}
-          </motion.div>
-        </AnimatePresence>
+        {renderScreen()}
       </PhoneFrame>
+
+      {/* Screen Debug Switcher bar for desktop testing */}
+      <div className="hidden lg:flex fixed bottom-3 right-3 bg-white/90 backdrop-blur-xl border border-[#E4E7EB] rounded-2xl p-2 z-50 shadow-xl max-w-md flex-wrap gap-1 items-center">
+        <span className="text-[10px] font-black text-[#23351F] uppercase tracking-wider px-2">Dev Screen:</span>
+        <select
+          value={active}
+          onChange={e => nav(e.target.value as Screen)}
+          className="text-xs bg-[#EEF1F3] border border-[#E4E7EB] font-bold text-[#222E1C] rounded-lg px-2 py-1 outline-none"
+        >
+          {ALL_SCREENS.map(s => (
+            <option key={s} value={s}>{SCREEN_LABELS[s] || s}</option>
+          ))}
+        </select>
+      </div>
     </div>
   );
 }
