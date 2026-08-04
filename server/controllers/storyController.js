@@ -18,18 +18,18 @@ const getStory = async (req, res, next) => {
   }
 };
 
-// @desc    Interactive voice conversation with human-like guide Ara powered by Grok AI
+// @desc    Interactive voice conversation with heritage guide Ara
 // @route   POST /api/story/chat
 // @access  Public
 const chatWithGuideController = async (req, res, next) => {
   try {
-    const { siteName, userMessage, history, apiKey } = req.body;
+    const { siteName, userMessage, history } = req.body;
 
     if (!userMessage) {
       return res.status(400).json({ message: 'Please provide userMessage in request body.' });
     }
 
-    const response = await chatWithGuide(siteName, userMessage, history, apiKey);
+    const response = await chatWithGuide(siteName, userMessage, history);
     res.json(response);
   } catch (error) {
     next(error);

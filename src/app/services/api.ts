@@ -174,12 +174,11 @@ export interface ChatGuideResponse {
 export async function chatWithGuide(
   siteName: string,
   userMessage: string,
-  history?: ChatGuideMessage[],
-  apiKey?: string
+  history?: ChatGuideMessage[]
 ): Promise<ChatGuideResponse> {
   return request<ChatGuideResponse>('/story/chat', {
     method: 'POST',
-    body: JSON.stringify({ siteName, userMessage, history, apiKey }),
+    body: JSON.stringify({ siteName, userMessage, history }),
   });
 }
 

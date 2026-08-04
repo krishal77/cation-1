@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "motion/react";
 import {
   Search, Camera, MapPin, Bookmark, Clock, Star, ChevronRight,
   ArrowLeft, Play, Pause, SkipBack, SkipForward, Volume2,
-  Mic, MicOff, Send, Key, MessageSquare, Wifi, WifiOff, Bell, Settings, User, Globe, Heart,
+  Mic, MicOff, Send, MessageSquare, Wifi, WifiOff, Bell, Settings, User, Globe, Heart,
   Trophy, Compass, Home, BookOpen, MoreHorizontal, X, Check,
   Filter, Share2, Download, Eye, Navigation, Zap, Moon, Sun,
   ChevronDown, Plus, Minus, RotateCcw, Info, Award, Map,
@@ -1347,10 +1347,7 @@ function AudioGuideScreen({ onBack, selectedSite }: { onBack: () => void; select
   const [storyData, setStoryData] = useState<StoryData | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Interactive Voice Chat & Grok Key state
-  const [apiKey, setApiKey] = useState<string>(() => localStorage.getItem('grok_api_key') || '');
-  const [showKeyModal, setShowKeyModal] = useState(false);
-  const [keyInput, setKeyInput] = useState(apiKey);
+  // Interactive Voice Chat state
   const [inputQuery, setInputQuery] = useState('');
   const [isThinking, setIsThinking] = useState(false);
   const [isListening, setIsListening] = useState(false);
@@ -1413,14 +1410,6 @@ function AudioGuideScreen({ onBack, selectedSite }: { onBack: () => void; select
     }
   }, []);
 
-  // Save Grok Key
-  const handleSaveKey = () => {
-    const trimmed = keyInput.trim();
-    setApiKey(trimmed);
-    localStorage.setItem('grok_api_key', trimmed);
-    setShowKeyModal(false);
-  };
-
   // Interactive Message Sender
   const handleSendMessage = async (textToSend?: string) => {
     const query = (textToSend || inputQuery).trim();
@@ -1432,7 +1421,7 @@ function AudioGuideScreen({ onBack, selectedSite }: { onBack: () => void; select
     setIsThinking(true);
 
     try {
-      const res = await chatWithGuide(selectedSite || 'Heritage Site', query, newHistory, apiKey);
+      const res = await chatWithGuide(selectedSite || 'Heritage Site', query, newHistory);
       const araReply = res.reply;
       setChatHistory([...newHistory, { sender: 'ara', text: araReply }]);
       speakText(araReply, rate);
@@ -1539,13 +1528,6 @@ function AudioGuideScreen({ onBack, selectedSite }: { onBack: () => void; select
         </div>
         <div className="flex items-center gap-2">
           <button
-            onClick={() => setShowKeyModal(true)}
-            className="flex items-center gap-1.5 bg-[#EAF6DD] text-[#23351F] border border-[#CAE5B1] text-xs font-bold px-3 py-1.5 rounded-full hover:bg-[#CAE5B1]/50 transition-all"
-          >
-            <Key size={12} className="text-[#69A20D]" />
-            <span>{apiKey ? (apiKey.startsWith('AIza') ? 'Gemini Active' : 'Grok Active') : 'Set API Key'}</span>
-          </button>
-          <button
             onClick={handleRateChange}
             className="bg-[#EEF1F3] text-[#222E1C] border border-[#E4E7EB] text-xs font-bold px-2.5 py-1.5 rounded-full"
           >
@@ -1567,10 +1549,7 @@ function AudioGuideScreen({ onBack, selectedSite }: { onBack: () => void; select
         <div className="flex-1">
           <div className="flex items-center gap-1.5 mb-1">
             <h2 className="text-[#222E1C] font-black text-sm font-display">{selectedSite || "Heritage Site"}</h2>
-            <Badge
-              label={apiKey ? (apiKey.startsWith('AIza') ? "Gemini 2.0" : "xAI Grok") : "Local AI"}
-              color={apiKey ? "gold" : "sand"}
-            />
+            <Badge label="Ara Guide" color="sand" />
           </div>
           <p className="text-[#5F6B5E] text-xs font-medium leading-tight">
             {isListening ? "🎙️ Ara is listening..." : playing ? "🗣️ Ara is speaking..." : isThinking ? "🧠 Ara is thinking..." : "Ask Ara anything aloud or type below!"}
@@ -1683,44 +1662,6 @@ function AudioGuideScreen({ onBack, selectedSite }: { onBack: () => void; select
           </div>
         </div>
       </div>
-
-      {/* Gemini / Grok API Key Modal */}
-      <AnimatePresence>
-        {showKeyModal && (
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-5">
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-white rounded-3xl p-6 max-w-sm w-full border border-[#E4E7EB] shadow-2xl"
-            >
-              <div className="flex justify-between items-center mb-4">
-                <div className="flex items-center gap-2">
-                  <Key size={18} className="text-[#69A20D]" />
-                  <h3 className="text-[#222E1C] font-black text-base font-display">Configure AI API Key</h3>
-                </div>
-                <button onClick={() => setShowKeyModal(false)}><X size={18} className="text-[#5F6B5E]" /></button>
-              </div>
-              <p className="text-[#5F6B5E] text-xs leading-relaxed mb-4">
-                Enter your <b>Google Gemini API Key</b> (`AIza...`) or <b>xAI Grok API Key</b> (`xai-...`) to power Ara with live conversational AI.
-              </p>
-              <div className="mb-4">
-                <input
-                  type="password"
-                  placeholder="AIza... or xai-..."
-                  value={keyInput}
-                  onChange={e => setKeyInput(e.target.value)}
-                  className="w-full bg-[#EEF1F3] border border-[#E4E7EB] rounded-2xl px-4 py-3 text-xs text-[#222E1C] outline-none focus:border-[#69A20D]"
-                />
-              </div>
-              <div className="flex gap-2">
-                <GhostButton label="Cancel" full onClick={() => setShowKeyModal(false)} />
-                <PrimaryButton label="Save Key" full onClick={handleSaveKey} />
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
     </div>
   );
 }
