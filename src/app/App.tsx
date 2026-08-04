@@ -1397,19 +1397,18 @@ function AudioGuideScreen({ onBack, selectedSite }: { onBack: () => void; select
 
       const voices = window.speechSynthesis.getVoices();
 
-      // Priority list: cute, young, warm female voices across platforms
+      // Priority list — Samantha is always first choice
       const cutePriority = [
+        'Samantha',       // macOS/iOS — #1 choice, classic cute
         'Zira',           // Windows — young female
         'Aria',           // Windows — natural, warm
-        'Samantha',       // macOS/iOS — classic cute
         'Ava',            // macOS — newer natural voice
         'Nicky',          // macOS
         'Kate',           // macOS UK
         'Fiona',          // macOS Scottish (charming)
-        'Monica',         // macOS Spanish (warm)
         'Karen',          // macOS Australian
         'Moira',          // macOS Irish
-        'Google UK English Female', // Chrome Android — very natural
+        'Google UK English Female', // Chrome Android
         'Google US English',        // Chrome fallback
       ];
 
