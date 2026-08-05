@@ -1871,6 +1871,7 @@ function MapScreen({ onNav, onBack, onSelectSite }: { onNav: (s: Screen) => void
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
   const markersRef = useRef<any[]>([]);
+  const routePolylineRef = useRef<any>(null);
 
   type PlaceCategory = 'Temple' | 'Buddhist' | 'UNESCO' | 'Palace' | 'Park';
 
@@ -1897,8 +1898,9 @@ function MapScreen({ onNav, onBack, onSelectSite }: { onNav: (s: Screen) => void
   const [selectedIdx, setSelectedIdx] = useState(0);
   const [mapLoaded, setMapLoaded] = useState(false);
   const [activeFilter, setActiveFilter] = useState<FilterCat>('All');
-  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number }>({ lat: 27.7172, lng: 85.3240 });
   const [locating, setLocating] = useState(false);
+  const [showRouteLine, setShowRouteLine] = useState(false);
 
   const filteredPlaces = activeFilter === 'All'
     ? heritagePlaces
@@ -1910,6 +1912,27 @@ function MapScreen({ onNav, onBack, onSelectSite }: { onNav: (s: Screen) => void
   const categoryBg: Record<string, string> = {
     Temple: '#FEF3C7', Buddhist: '#EDE9FE', UNESCO: '#DBEAFE', Palace: '#FEF3C7', Park: '#DCFCE7',
   };
+
+  const calcDistanceKm = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+    const R = 6371;
+    const dLat = (lat2 - lat1) * (Math.PI / 180);
+    const dLon = (lon2 - lon1) * (Math.PI / 180);
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return Math.round((R * c) * 10) / 10;
+  };
+
+  const selectedPlace = heritagePlaces[selectedIdx];
+  const distanceKm = calcDistanceKm(userLocation.lat, userLocation.lng, selectedPlace.lat, selectedPlace.lng);
+  const distanceMiles = (distanceKm * 0.621371).toFixed(1);
+  const drivingMins = Math.max(5, Math.round((distanceKm / 22) * 60));
+  const walkingHours = (distanceKm / 4.5);
+  const walkingTimeText = walkingHours < 1
+    ? `${Math.round(walkingHours * 60)} mins`
+    : `${Math.floor(walkingHours)}h ${Math.round((walkingHours % 1) * 60)}m`;
 
   useEffect(() => {
     let map: any = null;
@@ -1943,17 +1966,17 @@ function MapScreen({ onNav, onBack, onSelectSite }: { onNav: (s: Screen) => void
         markersRef.current.push(marker);
       });
 
-      // User location
+      const userIcon = L.divIcon({
+        className: '',
+        html: `<div style="width:20px;height:20px;background:#3B82F6;border:3.5px solid white;border-radius:50%;box-shadow:0 0 0 6px rgba(59,130,246,0.3);"></div>`,
+        iconSize: [20, 20], iconAnchor: [10, 10],
+      });
+      L.marker([userLocation.lat, userLocation.lng], { icon: userIcon }).addTo(map).bindTooltip('📍 Your Location', { permanent: false });
+
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition((pos) => {
           const { latitude: lat, longitude: lng } = pos.coords;
           setUserLocation({ lat, lng });
-          const userIcon = L.divIcon({
-            className: '',
-            html: `<div style="width:18px;height:18px;background:#3B82F6;border:3px solid white;border-radius:50%;box-shadow:0 0 0 6px rgba(59,130,246,0.25);"></div>`,
-            iconSize: [18, 18], iconAnchor: [9, 9],
-          });
-          L.marker([lat, lng], { icon: userIcon }).addTo(map).bindTooltip('📍 You are here', { permanent: false });
         }, () => {}, { timeout: 8000 });
       }
 
@@ -1964,10 +1987,57 @@ function MapScreen({ onNav, onBack, onSelectSite }: { onNav: (s: Screen) => void
     return () => { if (mapInstanceRef.current) { mapInstanceRef.current.remove(); mapInstanceRef.current = null; } };
   }, []);
 
+  const updateRouteLine = async (targetPlace: typeof heritagePlaces[0], userPos: { lat: number; lng: number }) => {
+    if (!mapInstanceRef.current) return;
+    const L = (await import('leaflet')).default;
+
+    if (routePolylineRef.current) {
+      mapInstanceRef.current.removeLayer(routePolylineRef.current);
+      routePolylineRef.current = null;
+    }
+
+    const latlngs = [
+      [userPos.lat, userPos.lng],
+      [targetPlace.lat, targetPlace.lng]
+    ];
+
+    const dist = calcDistanceKm(userPos.lat, userPos.lng, targetPlace.lat, targetPlace.lng);
+
+    const polyline = L.polyline(latlngs, {
+      color: '#69A20D',
+      weight: 4,
+      dashArray: '8, 8',
+      opacity: 0.85
+    }).addTo(mapInstanceRef.current);
+
+    polyline.bindTooltip(`Distance: <b>${dist} km</b>`, { permanent: true, direction: 'center' });
+    routePolylineRef.current = polyline;
+
+    mapInstanceRef.current.fitBounds(L.latLngBounds(latlngs), { padding: [45, 45], maxZoom: 15, animate: true });
+  };
+
   const handleSelectPlace = (realIdx: number) => {
     setSelectedIdx(realIdx);
     const place = heritagePlaces[realIdx];
-    if (mapInstanceRef.current) mapInstanceRef.current.flyTo([place.lat, place.lng], 15, { duration: 1.2 });
+    if (mapInstanceRef.current) {
+      if (showRouteLine) {
+        updateRouteLine(place, userLocation);
+      } else {
+        mapInstanceRef.current.flyTo([place.lat, place.lng], 15, { duration: 1.2 });
+      }
+    }
+  };
+
+  const handleToggleRoute = () => {
+    const nextState = !showRouteLine;
+    setShowRouteLine(nextState);
+    if (nextState) {
+      updateRouteLine(selectedPlace, userLocation);
+    } else if (routePolylineRef.current && mapInstanceRef.current) {
+      mapInstanceRef.current.removeLayer(routePolylineRef.current);
+      routePolylineRef.current = null;
+      mapInstanceRef.current.flyTo([selectedPlace.lat, selectedPlace.lng], 15, { duration: 1.2 });
+    }
   };
 
   const handleNearMe = () => {
@@ -1975,9 +2045,10 @@ function MapScreen({ onNav, onBack, onSelectSite }: { onNav: (s: Screen) => void
     setLocating(true);
     navigator.geolocation.getCurrentPosition((pos) => {
       setLocating(false);
-      setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+      const newLoc = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+      setUserLocation(newLoc);
       if (mapInstanceRef.current) {
-        mapInstanceRef.current.flyTo([pos.coords.latitude, pos.coords.longitude], 13, { duration: 1.5 });
+        mapInstanceRef.current.flyTo([newLoc.lat, newLoc.lng], 14, { duration: 1.5 });
       }
     }, () => setLocating(false), { timeout: 8000 });
   };
@@ -1987,8 +2058,6 @@ function MapScreen({ onNav, onBack, onSelectSite }: { onNav: (s: Screen) => void
     window.open(url, '_blank');
   };
 
-  const selectedPlace = heritagePlaces[selectedIdx];
-
   return (
     <div className="flex flex-col bg-[#F7F9F6] min-h-full flex-1">
       {/* Header */}
@@ -1997,8 +2066,8 @@ function MapScreen({ onNav, onBack, onSelectSite }: { onNav: (s: Screen) => void
           <ArrowLeft size={18} />
         </button>
         <div className="flex-1">
-          <span className="text-[#222E1C] text-base font-black font-display block leading-tight">Heritage Map</span>
-          <span className="text-[#5F6B5E] text-[10px] font-medium">{heritagePlaces.length} sites · Nepal</span>
+          <span className="text-[#222E1C] text-base font-black font-display block leading-tight">Interactive Map & Distance</span>
+          <span className="text-[#5F6B5E] text-[10px] font-medium">{heritagePlaces.length} sites · Haversine GPS Distance</span>
         </div>
         <button onClick={handleNearMe} disabled={locating}
           className="flex items-center gap-1.5 bg-[#EAF6DD] text-[#23351F] border border-[#CAE5B1] text-xs font-bold px-3 py-1.5 rounded-full">
@@ -2021,13 +2090,13 @@ function MapScreen({ onNav, onBack, onSelectSite }: { onNav: (s: Screen) => void
         ))}
       </div>
 
-      {/* Map */}
+      {/* Real OpenStreetMap Container */}
       <div className="mx-5 mb-3 relative rounded-3xl overflow-hidden border border-[#E4E7EB] shadow-sm" style={{ height: 320 }}>
         <div ref={mapContainerRef} className="w-full h-full z-0" />
         {!mapLoaded && (
           <div className="absolute inset-0 bg-[#EEF1F3] flex items-center justify-center gap-2 text-sm text-[#23351F] font-bold">
             <Loader2 size={18} className="animate-spin text-[#69A20D]" />
-            <span>Loading map...</span>
+            <span>Loading OpenStreetMap...</span>
           </div>
         )}
         {/* Map Legend */}
@@ -2042,10 +2111,12 @@ function MapScreen({ onNav, onBack, onSelectSite }: { onNav: (s: Screen) => void
         </div>
       </div>
 
-      {/* Selected Place Tourist Card */}
+      {/* Distance Calculator & Route Card */}
       <div className="px-5 mb-3">
         <motion.div key={selectedPlace.name} initial={{ y: 10, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
           className="bg-white rounded-3xl border border-[#E4E7EB] shadow-sm overflow-hidden">
+          
+          {/* Header & Site info */}
           <div className="flex items-start gap-3 p-4 pb-3">
             <div className="w-16 h-16 rounded-2xl bg-[#EEF1F3] overflow-hidden flex-shrink-0">
               <img src={getSiteImage(selectedPlace.name)} alt={selectedPlace.name} className="w-full h-full object-cover" />
@@ -2072,6 +2143,44 @@ function MapScreen({ onNav, onBack, onSelectSite }: { onNav: (s: Screen) => void
             </div>
           </div>
 
+          {/* Real-time GPS Distance Matrix Grid */}
+          <div className="mx-4 mb-3 bg-[#EAF6DD] rounded-2xl p-3 border border-[#CAE5B1]">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[10px] font-black uppercase text-[#23351F] tracking-wider flex items-center gap-1">
+                <Navigation size={12} className="text-[#69A20D]" /> Real GPS Distance Calculator
+              </span>
+              <button onClick={handleToggleRoute}
+                className={`text-[10px] font-bold px-2.5 py-1 rounded-full border transition-all ${
+                  showRouteLine
+                    ? 'bg-[#23351F] text-white border-[#23351F]'
+                    : 'bg-white text-[#23351F] border-[#CAE5B1]'
+                }`}>
+                {showRouteLine ? '✓ Route Line Active' : '📍 Show Route Line'}
+              </button>
+            </div>
+            
+            <div className="grid grid-cols-3 gap-2 text-center">
+              <div className="bg-white rounded-xl py-2 px-1 border border-[#CAE5B1]">
+                <p className="text-[#69A20D] text-[9px] font-black uppercase">Direct Distance</p>
+                <p className="text-[#222E1C] text-sm font-black mt-0.5">{distanceKm} km</p>
+                <p className="text-[#5F6B5E] text-[9px] font-medium">{distanceMiles} mi</p>
+              </div>
+
+              <div className="bg-white rounded-xl py-2 px-1 border border-[#CAE5B1]">
+                <p className="text-[#69A20D] text-[9px] font-black uppercase">Driving 🚗</p>
+                <p className="text-[#222E1C] text-sm font-black mt-0.5">~{drivingMins} mins</p>
+                <p className="text-[#5F6B5E] text-[9px] font-medium">Estimated Drive</p>
+              </div>
+
+              <div className="bg-white rounded-xl py-2 px-1 border border-[#CAE5B1]">
+                <p className="text-[#69A20D] text-[9px] font-black uppercase">Walking 🚶</p>
+                <p className="text-[#222E1C] text-sm font-black mt-0.5">{walkingTimeText}</p>
+                <p className="text-[#5F6B5E] text-[9px] font-medium">Foot Pace</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Tourist Info Grid */}
           <div className="grid grid-cols-3 gap-0 border-t border-[#F0F2F0] mx-4 mb-3">
             <div className="flex flex-col items-center py-2.5 border-r border-[#F0F2F0]">
               <Clock size={12} className="text-[#69A20D] mb-1" />
@@ -2090,16 +2199,12 @@ function MapScreen({ onNav, onBack, onSelectSite }: { onNav: (s: Screen) => void
             </div>
           </div>
 
-          <div className="mx-4 mb-3 bg-[#EAF6DD] rounded-2xl px-3 py-2 flex items-center gap-2 border border-[#CAE5B1]">
-            <Star size={12} className="text-[#69A20D] flex-shrink-0" />
-            <p className="text-[10px] text-[#23351F] font-bold">Must-see: <span className="font-medium">{selectedPlace.mustSee}</span></p>
-          </div>
-
+          {/* Action buttons */}
           <div className="flex gap-2 px-4 pb-4">
             <button onClick={() => handleDirections(selectedPlace)}
               className="flex-1 flex items-center justify-center gap-1.5 bg-[#23351F] text-white text-xs font-bold py-2.5 rounded-2xl shadow-sm">
               <Navigation size={12} />
-              Get Directions
+              Open Google Maps
             </button>
             <button onClick={() => { onSelectSite?.(selectedPlace.name); onNav("audio"); }}
               className="flex-1 flex items-center justify-center gap-1.5 bg-[#EAF6DD] text-[#23351F] text-xs font-bold py-2.5 rounded-2xl border border-[#CAE5B1]">
@@ -2114,7 +2219,7 @@ function MapScreen({ onNav, onBack, onSelectSite }: { onNav: (s: Screen) => void
         </motion.div>
       </div>
 
-      {/* Sites List */}
+      {/* Sites List with Distance Badges */}
       <div className="px-5 pb-6">
         <h3 className="text-[#222E1C] text-sm font-black mb-3 font-display">
           {activeFilter === 'All' ? 'All Sites' : activeFilter + ' Sites'} ({filteredPlaces.length})
@@ -2123,6 +2228,7 @@ function MapScreen({ onNav, onBack, onSelectSite }: { onNav: (s: Screen) => void
           {filteredPlaces.map((p) => {
             const realIdx = heritagePlaces.findIndex(h => h.name === p.name);
             const isSelected = selectedIdx === realIdx;
+            const itemDist = calcDistanceKm(userLocation.lat, userLocation.lng, p.lat, p.lng);
             return (
               <button key={p.name} onClick={() => handleSelectPlace(realIdx)}
                 className={`flex items-center gap-3 rounded-2xl p-3 border transition-all text-left ${isSelected ? "bg-[#EAF6DD] border-[#CAE5B1]" : "bg-white border-[#E4E7EB]"}`}>
@@ -2136,8 +2242,8 @@ function MapScreen({ onNav, onBack, onSelectSite }: { onNav: (s: Screen) => void
                       style={{ color: categoryColors[p.category], backgroundColor: categoryBg[p.category] }}>
                       {p.emoji} {p.category}
                     </span>
+                    <span className="text-[#69A20D] text-[9px] font-bold">📍 {itemDist} km</span>
                     <span className="text-[#5F6B5E] text-[9px] font-medium">{p.fee}</span>
-                    <span className="text-[#5F6B5E] text-[9px] font-medium">{p.hours}</span>
                   </div>
                 </div>
                 <div className="flex flex-col items-end gap-1 flex-shrink-0">
