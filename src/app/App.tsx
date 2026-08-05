@@ -1953,8 +1953,8 @@ function MapScreen({ onNav, onBack, onSelectSite }: { onNav: (s: Screen) => void
         const col = categoryColors[place.category] || '#23351F';
         const customIcon = L.divIcon({
           className: '',
-          html: `<div style="background:${col};color:white;border:2.5px solid white;border-radius:50%;width:34px;height:34px;display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 3px 12px rgba(0,0,0,0.25);cursor:pointer;">${place.emoji}</div>`,
-          iconSize: [34, 34], iconAnchor: [17, 34],
+          html: `<div style="background:${col};color:white;border:2.5px solid white;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:17px;box-shadow:0 4px 16px rgba(0,0,0,0.3);cursor:pointer;">${place.emoji}</div>`,
+          iconSize: [36, 36], iconAnchor: [18, 36],
         });
         const marker = L.marker([place.lat, place.lng], { icon: customIcon }).addTo(map);
         marker.bindTooltip(`<b>${place.name}</b><br/>${place.fee} · ${place.hours}`, { direction: 'top', offset: [0, -36] });
@@ -1968,8 +1968,8 @@ function MapScreen({ onNav, onBack, onSelectSite }: { onNav: (s: Screen) => void
 
       const userIcon = L.divIcon({
         className: '',
-        html: `<div style="width:20px;height:20px;background:#3B82F6;border:3.5px solid white;border-radius:50%;box-shadow:0 0 0 6px rgba(59,130,246,0.3);"></div>`,
-        iconSize: [20, 20], iconAnchor: [10, 10],
+        html: `<div style="width:22px;height:22px;background:#3B82F6;border:3.5px solid white;border-radius:50%;box-shadow:0 0 0 7px rgba(59,130,246,0.35);"></div>`,
+        iconSize: [22, 22], iconAnchor: [11, 11],
       });
       L.marker([userLocation.lat, userLocation.lng], { icon: userIcon }).addTo(map).bindTooltip('📍 Your Location', { permanent: false });
 
@@ -2007,7 +2007,7 @@ function MapScreen({ onNav, onBack, onSelectSite }: { onNav: (s: Screen) => void
       color: '#69A20D',
       weight: 4,
       dashArray: '8, 8',
-      opacity: 0.85
+      opacity: 0.9
     }).addTo(mapInstanceRef.current);
 
     polyline.bindTooltip(`Distance: <b>${dist} km</b>`, { permanent: true, direction: 'center' });
@@ -2059,48 +2059,73 @@ function MapScreen({ onNav, onBack, onSelectSite }: { onNav: (s: Screen) => void
   };
 
   return (
-    <div className="flex flex-col bg-[#F7F9F6] min-h-full flex-1">
-      {/* Header */}
-      <div className="px-5 pt-12 sm:pt-14 pb-3 flex items-center gap-3 bg-white border-b border-[#E4E7EB] shadow-xs">
+    <div className="flex flex-col bg-[#F7F9F6] h-full min-h-full flex-1 relative overflow-hidden">
+      {/* Top Bar Header */}
+      <div className="px-5 pt-12 sm:pt-14 pb-3 flex items-center gap-3 bg-white/95 backdrop-blur-md border-b border-[#E4E7EB] z-20 shadow-xs">
         <button onClick={onBack} className="w-9 h-9 rounded-full bg-[#EEF1F3] flex items-center justify-center text-[#222E1C]">
           <ArrowLeft size={18} />
         </button>
         <div className="flex-1">
           <span className="text-[#222E1C] text-base font-black font-display block leading-tight">Interactive Map & Distance</span>
-          <span className="text-[#5F6B5E] text-[10px] font-medium">{heritagePlaces.length} sites · Haversine GPS Distance</span>
+          <span className="text-[#5F6B5E] text-[10px] font-medium">{heritagePlaces.length} real locations</span>
         </div>
         <button onClick={handleNearMe} disabled={locating}
-          className="flex items-center gap-1.5 bg-[#EAF6DD] text-[#23351F] border border-[#CAE5B1] text-xs font-bold px-3 py-1.5 rounded-full">
+          className="flex items-center gap-1.5 bg-[#EAF6DD] text-[#23351F] border border-[#CAE5B1] text-xs font-bold px-3 py-1.5 rounded-full shadow-xs">
           {locating ? <Loader2 size={12} className="animate-spin" /> : <Navigation size={12} className="text-[#69A20D]" />}
           <span>{locating ? 'Locating...' : 'Near Me'}</span>
         </button>
       </div>
 
-      {/* Category Filter Tabs */}
-      <div className="flex gap-2 px-5 pt-3 pb-2 overflow-x-auto scrollbar-hide">
+      {/* Category Filter Pills Bar */}
+      <div className="px-5 py-2.5 bg-white border-b border-[#E4E7EB] flex gap-2 overflow-x-auto scrollbar-hide z-10">
         {categories.map(cat => (
           <button key={cat} onClick={() => setActiveFilter(cat)}
             className={`flex-shrink-0 text-xs font-bold px-3.5 py-1.5 rounded-full border transition-all ${
               activeFilter === cat
                 ? 'bg-[#23351F] text-white border-[#23351F]'
-                : 'bg-white text-[#5F6B5E] border-[#E4E7EB] hover:border-[#69A20D]'
+                : 'bg-[#EEF1F3] text-[#5F6B5E] border-[#E4E7EB] hover:border-[#69A20D]'
             }`}>
             {cat}
           </button>
         ))}
       </div>
 
-      {/* Real OpenStreetMap Container */}
-      <div className="mx-5 mb-3 relative rounded-3xl overflow-hidden border border-[#E4E7EB] shadow-sm" style={{ height: 320 }}>
-        <div ref={mapContainerRef} className="w-full h-full z-0" />
+      {/* Full-Screen Real OpenStreetMap Container */}
+      <div className="flex-1 relative w-full h-full min-h-[380px] z-0">
+        <div ref={mapContainerRef} className="w-full h-full inset-0 absolute" />
         {!mapLoaded && (
-          <div className="absolute inset-0 bg-[#EEF1F3] flex items-center justify-center gap-2 text-sm text-[#23351F] font-bold">
+          <div className="absolute inset-0 bg-[#EEF1F3] flex items-center justify-center gap-2 text-sm text-[#23351F] font-bold z-10">
             <Loader2 size={18} className="animate-spin text-[#69A20D]" />
             <span>Loading OpenStreetMap...</span>
           </div>
         )}
+
+        {/* Floating Quick Destination Selector Bar over Map */}
+        <div className="absolute top-3 left-3 right-3 z-10 overflow-x-auto scrollbar-hide flex gap-2 p-1.5 bg-white/90 backdrop-blur-md rounded-2xl border border-white/60 shadow-md">
+          {filteredPlaces.map(p => {
+            const realIdx = heritagePlaces.findIndex(h => h.name === p.name);
+            const isSel = selectedIdx === realIdx;
+            const dist = calcDistanceKm(userLocation.lat, userLocation.lng, p.lat, p.lng);
+            return (
+              <button
+                key={p.name}
+                onClick={() => handleSelectPlace(realIdx)}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap flex-shrink-0 transition-all ${
+                  isSel
+                    ? 'bg-[#23351F] text-white shadow-sm'
+                    : 'bg-white/80 text-[#222E1C] hover:bg-[#EAF6DD] border border-[#E4E7EB]'
+                }`}
+              >
+                <span>{p.emoji}</span>
+                <span>{p.name.split(' ')[0]}</span>
+                <span className={`text-[10px] ${isSel ? 'text-[#CAE5B1]' : 'text-[#69A20D]'}`}>({dist} km)</span>
+              </button>
+            );
+          })}
+        </div>
+
         {/* Map Legend */}
-        <div className="absolute bottom-3 left-3 bg-white/90 backdrop-blur-md rounded-2xl px-3 py-2 border border-white/60 shadow-sm">
+        <div className="absolute bottom-4 left-3 bg-white/95 backdrop-blur-md rounded-2xl px-3 py-2 border border-white/80 shadow-md z-10">
           <p className="text-[#222E1C] text-[9px] font-black mb-1">LEGEND</p>
           {(['Temple','Buddhist','UNESCO','Park'] as PlaceCategory[]).map(cat => (
             <div key={cat} className="flex items-center gap-1.5 mb-0.5">
@@ -2111,20 +2136,20 @@ function MapScreen({ onNav, onBack, onSelectSite }: { onNav: (s: Screen) => void
         </div>
       </div>
 
-      {/* Distance Calculator & Route Card */}
-      <div className="px-5 mb-3">
+      {/* Floating Selected Site Info & Real GPS Distance Card (No long vertical list!) */}
+      <div className="px-4 pb-4 pt-2 bg-[#F7F9F6] border-t border-[#E4E7EB] z-20">
         <motion.div key={selectedPlace.name} initial={{ y: 10, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
-          className="bg-white rounded-3xl border border-[#E4E7EB] shadow-sm overflow-hidden">
+          className="bg-white rounded-3xl border border-[#E4E7EB] shadow-md overflow-hidden">
           
           {/* Header & Site info */}
-          <div className="flex items-start gap-3 p-4 pb-3">
-            <div className="w-16 h-16 rounded-2xl bg-[#EEF1F3] overflow-hidden flex-shrink-0">
+          <div className="flex items-start gap-3 p-3.5 pb-2">
+            <div className="w-14 h-14 rounded-2xl bg-[#EEF1F3] overflow-hidden flex-shrink-0">
               <img src={getSiteImage(selectedPlace.name)} alt={selectedPlace.name} className="w-full h-full object-cover" />
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-1.5 mb-0.5 flex-wrap">
                 <p className="text-[#222E1C] font-black text-sm">{selectedPlace.name}</p>
-                <span className="text-xs px-2 py-0.5 rounded-full font-bold flex-shrink-0"
+                <span className="text-[10px] px-2 py-0.5 rounded-full font-bold flex-shrink-0"
                   style={{ color: categoryColors[selectedPlace.category], backgroundColor: categoryBg[selectedPlace.category] }}>
                   {selectedPlace.category}
                 </span>
@@ -2135,22 +2160,20 @@ function MapScreen({ onNav, onBack, onSelectSite }: { onNav: (s: Screen) => void
                   <span className="text-xs font-bold text-[#222E1C]">{selectedPlace.rating}</span>
                 </div>
                 <span className="text-[#94A3B8] text-xs">·</span>
-                <span className="text-[#5F6B5E] text-xs font-medium">{selectedPlace.tips} tips</span>
-                <span className="text-[#94A3B8] text-xs">·</span>
                 <MapPin size={9} className="text-[#69A20D]" />
                 <span className="text-[#5F6B5E] text-[10px] font-medium truncate">{selectedPlace.location}</span>
               </div>
             </div>
           </div>
 
-          {/* Real-time GPS Distance Matrix Grid */}
-          <div className="mx-4 mb-3 bg-[#EAF6DD] rounded-2xl p-3 border border-[#CAE5B1]">
-            <div className="flex items-center justify-between mb-2">
+          {/* Real GPS Distance Matrix Grid */}
+          <div className="mx-3.5 mb-2.5 bg-[#EAF6DD] rounded-2xl p-2.5 border border-[#CAE5B1]">
+            <div className="flex items-center justify-between mb-1.5">
               <span className="text-[10px] font-black uppercase text-[#23351F] tracking-wider flex items-center gap-1">
-                <Navigation size={12} className="text-[#69A20D]" /> Real GPS Distance Calculator
+                <Navigation size={11} className="text-[#69A20D]" /> Real GPS Distance Calculator
               </span>
               <button onClick={handleToggleRoute}
-                className={`text-[10px] font-bold px-2.5 py-1 rounded-full border transition-all ${
+                className={`text-[9px] font-bold px-2.5 py-0.5 rounded-full border transition-all ${
                   showRouteLine
                     ? 'bg-[#23351F] text-white border-[#23351F]'
                     : 'bg-white text-[#23351F] border-[#CAE5B1]'
@@ -2160,47 +2183,28 @@ function MapScreen({ onNav, onBack, onSelectSite }: { onNav: (s: Screen) => void
             </div>
             
             <div className="grid grid-cols-3 gap-2 text-center">
-              <div className="bg-white rounded-xl py-2 px-1 border border-[#CAE5B1]">
-                <p className="text-[#69A20D] text-[9px] font-black uppercase">Direct Distance</p>
-                <p className="text-[#222E1C] text-sm font-black mt-0.5">{distanceKm} km</p>
-                <p className="text-[#5F6B5E] text-[9px] font-medium">{distanceMiles} mi</p>
+              <div className="bg-white rounded-xl py-1.5 px-1 border border-[#CAE5B1]">
+                <p className="text-[#69A20D] text-[8px] font-black uppercase">Direct Distance</p>
+                <p className="text-[#222E1C] text-xs font-black mt-0.5">{distanceKm} km</p>
+                <p className="text-[#5F6B5E] text-[8px] font-medium">{distanceMiles} mi</p>
               </div>
 
-              <div className="bg-white rounded-xl py-2 px-1 border border-[#CAE5B1]">
-                <p className="text-[#69A20D] text-[9px] font-black uppercase">Driving 🚗</p>
-                <p className="text-[#222E1C] text-sm font-black mt-0.5">~{drivingMins} mins</p>
-                <p className="text-[#5F6B5E] text-[9px] font-medium">Estimated Drive</p>
+              <div className="bg-white rounded-xl py-1.5 px-1 border border-[#CAE5B1]">
+                <p className="text-[#69A20D] text-[8px] font-black uppercase">Driving 🚗</p>
+                <p className="text-[#222E1C] text-xs font-black mt-0.5">~{drivingMins} mins</p>
+                <p className="text-[#5F6B5E] text-[8px] font-medium">Estimated Drive</p>
               </div>
 
-              <div className="bg-white rounded-xl py-2 px-1 border border-[#CAE5B1]">
-                <p className="text-[#69A20D] text-[9px] font-black uppercase">Walking 🚶</p>
-                <p className="text-[#222E1C] text-sm font-black mt-0.5">{walkingTimeText}</p>
-                <p className="text-[#5F6B5E] text-[9px] font-medium">Foot Pace</p>
+              <div className="bg-white rounded-xl py-1.5 px-1 border border-[#CAE5B1]">
+                <p className="text-[#69A20D] text-[8px] font-black uppercase">Walking 🚶</p>
+                <p className="text-[#222E1C] text-xs font-black mt-0.5">{walkingTimeText}</p>
+                <p className="text-[#5F6B5E] text-[8px] font-medium">Foot Pace</p>
               </div>
-            </div>
-          </div>
-
-          {/* Tourist Info Grid */}
-          <div className="grid grid-cols-3 gap-0 border-t border-[#F0F2F0] mx-4 mb-3">
-            <div className="flex flex-col items-center py-2.5 border-r border-[#F0F2F0]">
-              <Clock size={12} className="text-[#69A20D] mb-1" />
-              <p className="text-[10px] font-black text-[#222E1C]">{selectedPlace.hours}</p>
-              <p className="text-[9px] text-[#94A3B8] font-medium">Hours</p>
-            </div>
-            <div className="flex flex-col items-center py-2.5 border-r border-[#F0F2F0]">
-              <span className="text-xs mb-1">🎟️</span>
-              <p className="text-[10px] font-black text-[#222E1C]">{selectedPlace.fee}</p>
-              <p className="text-[9px] text-[#94A3B8] font-medium">Entry Fee</p>
-            </div>
-            <div className="flex flex-col items-center py-2.5">
-              <Sun size={12} className="text-amber-400 mb-1" />
-              <p className="text-[10px] font-black text-[#222E1C]">{selectedPlace.bestTime}</p>
-              <p className="text-[9px] text-[#94A3B8] font-medium">Best Time</p>
             </div>
           </div>
 
           {/* Action buttons */}
-          <div className="flex gap-2 px-4 pb-4">
+          <div className="flex gap-2 px-3.5 pb-3">
             <button onClick={() => handleDirections(selectedPlace)}
               className="flex-1 flex items-center justify-center gap-1.5 bg-[#23351F] text-white text-xs font-bold py-2.5 rounded-2xl shadow-sm">
               <Navigation size={12} />
@@ -2218,49 +2222,10 @@ function MapScreen({ onNav, onBack, onSelectSite }: { onNav: (s: Screen) => void
           </div>
         </motion.div>
       </div>
-
-      {/* Sites List with Distance Badges */}
-      <div className="px-5 pb-6">
-        <h3 className="text-[#222E1C] text-sm font-black mb-3 font-display">
-          {activeFilter === 'All' ? 'All Sites' : activeFilter + ' Sites'} ({filteredPlaces.length})
-        </h3>
-        <div className="flex flex-col gap-2">
-          {filteredPlaces.map((p) => {
-            const realIdx = heritagePlaces.findIndex(h => h.name === p.name);
-            const isSelected = selectedIdx === realIdx;
-            const itemDist = calcDistanceKm(userLocation.lat, userLocation.lng, p.lat, p.lng);
-            return (
-              <button key={p.name} onClick={() => handleSelectPlace(realIdx)}
-                className={`flex items-center gap-3 rounded-2xl p-3 border transition-all text-left ${isSelected ? "bg-[#EAF6DD] border-[#CAE5B1]" : "bg-white border-[#E4E7EB]"}`}>
-                <div className="w-10 h-10 rounded-xl bg-[#EEF1F3] overflow-hidden flex-shrink-0">
-                  <img src={getSiteImage(p.name)} alt="" className="w-full h-full object-cover" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className={`text-sm font-bold truncate ${isSelected ? "text-[#23351F]" : "text-[#222E1C]"}`}>{p.name}</p>
-                  <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-                    <span className="text-[9px] px-1.5 py-0.5 rounded-full font-bold"
-                      style={{ color: categoryColors[p.category], backgroundColor: categoryBg[p.category] }}>
-                      {p.emoji} {p.category}
-                    </span>
-                    <span className="text-[#69A20D] text-[9px] font-bold">📍 {itemDist} km</span>
-                    <span className="text-[#5F6B5E] text-[9px] font-medium">{p.fee}</span>
-                  </div>
-                </div>
-                <div className="flex flex-col items-end gap-1 flex-shrink-0">
-                  <div className="flex items-center gap-1">
-                    <Star size={9} className="text-amber-400 fill-amber-400" />
-                    <span className="text-[10px] font-bold text-[#222E1C]">{p.rating}</span>
-                  </div>
-                  <MapPin size={13} className={isSelected ? "text-[#69A20D]" : "text-[#94A3B8]"} />
-                </div>
-              </button>
-            );
-          })}
-        </div>
-      </div>
     </div>
   );
 }
+
 
 function ExploreScreen({ onNav, onSelectSite }: { onNav: (s: Screen) => void; onSelectSite: (name: string) => void }) {
   const [activeFilter, setActiveFilter] = useState("All");
