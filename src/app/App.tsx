@@ -769,30 +769,22 @@ function HomeScreen({ onNav, onScan, onSelectSite }: { onNav: (s: Screen) => voi
 function CameraScreen({ onScan, onBack, onFileSelect }: { onScan: () => void; onBack: () => void; onFileSelect: (file: File) => void }) {
   const [scanning, setScanning] = useState(false);
   const [cameraActive, setCameraActive] = useState(false);
+  const [flashOn, setFlashOn] = useState(false);
+  const [cameraMode, setCameraMode] = useState<"SCAN" | "PHOTO" | "GALLERY">("SCAN");
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
 
-  // Initialize live camera hardware on mount
   useEffect(() => {
     let isMounted = true;
-
     async function startCamera() {
       try {
-        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-          return;
-        }
-
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return;
         const stream = await navigator.mediaDevices.getUserMedia({
-          video: {
-            facingMode: { ideal: "environment" },
-            width: { ideal: 1920 },
-            height: { ideal: 1080 }
-          },
+          video: { facingMode: { ideal: "environment" }, width: { ideal: 1920 }, height: { ideal: 1080 } },
           audio: false,
         });
-
         if (isMounted) {
           streamRef.current = stream;
           if (videoRef.current) {
@@ -804,20 +796,14 @@ function CameraScreen({ onScan, onBack, onFileSelect }: { onScan: () => void; on
           stream.getTracks().forEach(t => t.stop());
         }
       } catch (err: unknown) {
-        console.warn("Live camera access failed, falling back to file picker:", err);
-        if (isMounted) {
-          setCameraActive(false);
-        }
+        console.warn("Camera access failed:", err);
+        if (isMounted) setCameraActive(false);
       }
     }
-
     startCamera();
-
     return () => {
       isMounted = false;
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach(track => track.stop());
-      }
+      if (streamRef.current) streamRef.current.getTracks().forEach(t => t.stop());
     };
   }, []);
 
@@ -856,102 +842,165 @@ function CameraScreen({ onScan, onBack, onFileSelect }: { onScan: () => void; on
   };
 
   return (
-    <div className="h-full min-h-full flex-1 bg-black flex flex-col relative overflow-hidden">
+    <div className="h-full min-h-full flex-1 bg-black flex flex-col relative overflow-hidden select-none">
       <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
       <canvas ref={canvasRef} className="hidden" />
 
-      {/* Camera View Area */}
+      {/* Camera Viewport Area */}
       <div className="absolute inset-0 bg-black flex items-center justify-center">
         <video
           ref={videoRef}
           autoPlay
           playsInline
           muted
-          className={`w-full h-full object-cover transition-opacity duration-300 ${cameraActive ? "opacity-100" : "opacity-0"}`}
+          className={`w-full h-full object-cover transition-opacity duration-500 ${cameraActive ? "opacity-100" : "opacity-0"}`}
         />
 
         {!cameraActive && (
           <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center">
-            <img src="https://images.unsplash.com/photo-1761048803183-fc870f25e221?w=400&h=852&fit=crop&auto=format"
-              alt="camera preview" className="w-full h-full object-cover opacity-40 absolute inset-0" />
-            <div className="relative z-10 bg-black/70 backdrop-blur-md rounded-3xl p-6 border border-white/20 shadow-2xl max-w-[300px]">
-              <Camera size={40} className="text-[#69A20D] mx-auto mb-3" />
-              <p className="text-white text-sm font-bold mb-1">Identify Heritage Site</p>
-              <p className="text-white/60 text-xs mb-4">Tap to take a photo or upload an image from gallery</p>
+            <img
+              src="https://images.unsplash.com/photo-1761048803183-fc870f25e221?w=600&h=900&fit=crop&auto=format"
+              alt="camera preview"
+              className="w-full h-full object-cover opacity-30 absolute inset-0"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/60" />
+            
+            <div className="relative z-10 bg-black/75 backdrop-blur-xl rounded-3xl p-6 border border-white/20 shadow-2xl max-w-[320px] text-center">
+              <div className="w-16 h-16 rounded-2xl bg-[#69A20D]/20 border border-[#69A20D]/40 flex items-center justify-center mx-auto mb-4">
+                <Camera size={32} className="text-[#69A20D]" />
+              </div>
+              <h3 className="text-white text-base font-black font-display mb-1">AI Heritage Scanner</h3>
+              <p className="text-white/70 text-xs mb-5 leading-relaxed">
+                Scan temples, stupas, or monuments for instant history & voice tour guide.
+              </p>
               <button
                 onClick={() => fileInputRef.current?.click()}
-                className="bg-[#23351F] text-white text-xs font-bold px-5 py-3 rounded-2xl shadow-lg w-full"
+                className="bg-[#69A20D] hover:bg-[#58890a] text-white text-xs font-bold py-3.5 px-6 rounded-2xl shadow-lg w-full transition-all flex items-center justify-center gap-2"
               >
-                Upload / Take Photo
+                <Plus size={16} />
+                <span>Upload / Take Photo</span>
               </button>
             </div>
           </div>
         )}
-        <div className="absolute inset-0 bg-black/20 pointer-events-none" />
+        <div className="absolute inset-0 bg-black/25 pointer-events-none" />
       </div>
 
-      {/* Top bar */}
-      <div className="relative z-10 flex items-center justify-between px-5 pt-16 pb-4">
-        <button onClick={onBack} className="w-10 h-10 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center">
-          <ArrowLeft size={18} className="text-white" />
+      {/* Top Controls Bar */}
+      <div className="relative z-10 flex items-center justify-between px-5 pt-14 pb-4">
+        <button
+          onClick={onBack}
+          className="w-10 h-10 rounded-full bg-black/40 backdrop-blur-md border border-white/20 flex items-center justify-center text-white active:scale-95 transition-all"
+        >
+          <ArrowLeft size={18} />
         </button>
-        <div className="bg-black/40 backdrop-blur-md rounded-full px-4 py-2 border border-white/10">
-          <p className="text-white text-xs font-semibold">Point at a heritage site</p>
+
+        <div className="bg-black/50 backdrop-blur-md rounded-full px-3.5 py-1.5 border border-white/15 flex items-center gap-1.5 shadow-md">
+          <Sparkles size={12} className="text-[#CAE5B1]" />
+          <span className="text-white text-xs font-bold tracking-tight">OpenCLIP AI Scanner</span>
         </div>
-        <button onClick={() => fileInputRef.current?.click()} className="w-10 h-10 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center">
-          <Plus size={18} className="text-white" />
+
+        <button
+          onClick={() => setFlashOn(!flashOn)}
+          className={`w-10 h-10 rounded-full backdrop-blur-md border flex items-center justify-center transition-all ${
+            flashOn ? "bg-[#69A20D] text-white border-[#69A20D]" : "bg-black/40 text-white/80 border-white/20"
+          }`}
+        >
+          <Zap size={16} />
         </button>
       </div>
 
-      {/* Reticle Frame */}
-      <div className="relative z-10 flex-1 flex items-center justify-center">
-        <div className="relative w-64 h-64">
-          {[["top-0 left-0 border-t-2 border-l-2", "rounded-tl-2xl"],
-            ["top-0 right-0 border-t-2 border-r-2", "rounded-tr-2xl"],
-            ["bottom-0 left-0 border-b-2 border-l-2", "rounded-bl-2xl"],
-            ["bottom-0 right-0 border-b-2 border-r-2", "rounded-br-2xl"]
+      {/* Viewfinder Reticle Frame */}
+      <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-6">
+        <div className="relative w-64 h-64 sm:w-72 sm:h-72">
+          {[
+            ["top-0 left-0 border-t-3 border-l-3", "rounded-tl-2xl"],
+            ["top-0 right-0 border-t-3 border-r-3", "rounded-tr-2xl"],
+            ["bottom-0 left-0 border-b-3 border-l-3", "rounded-bl-2xl"],
+            ["bottom-0 right-0 border-b-3 border-r-3", "rounded-br-2xl"]
           ].map(([pos, round], i) => (
-            <div key={i} className={`absolute w-10 h-10 border-[#69A20D] ${pos} ${round}`} />
+            <div key={i} className={`absolute w-10 h-10 border-[#69A20D] ${pos} ${round} shadow-[0_0_12px_rgba(105,162,13,0.6)]`} />
           ))}
+
           <motion.div
-            className="absolute left-2 right-2 h-0.5 bg-gradient-to-r from-transparent via-[#69A20D] to-transparent"
-            animate={{ top: ["10%", "90%", "10%"] }}
-            transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute left-3 right-3 h-0.5 bg-gradient-to-r from-transparent via-[#69A20D] to-transparent shadow-[0_0_15px_#69A20D]"
+            animate={{ top: ["8%", "92%", "8%"] }}
+            transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
           />
-          <div className="absolute inset-0 flex items-center justify-center">
-            <MascotSVG size={60} animate />
+
+          <div className="absolute inset-0 flex items-center justify-center opacity-80 pointer-events-none">
+            <MascotSVG size={64} animate />
           </div>
         </div>
+
+        <div className="mt-6 bg-black/60 backdrop-blur-md border border-white/15 px-4 py-2 rounded-full shadow-lg">
+          <p className="text-white/90 text-xs font-semibold text-center flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-[#69A20D] animate-ping" />
+            Align heritage site within frame
+          </p>
+        </div>
       </div>
 
-      {/* Bottom controls */}
-      <div className="relative z-10 px-5 pb-12">
-        <div className="flex items-center justify-between mb-6">
-          <button onClick={() => fileInputRef.current?.click()} className="flex flex-col items-center gap-1">
-            <div className="w-12 h-12 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center border border-white/20">
+      {/* Camera Controls Area */}
+      <div className="relative z-10 px-6 pb-10">
+        <div className="flex justify-center gap-6 mb-6">
+          {(["SCAN", "PHOTO", "GALLERY"] as const).map(mode => (
+            <button
+              key={mode}
+              onClick={() => {
+                setCameraMode(mode);
+                if (mode === "GALLERY") fileInputRef.current?.click();
+              }}
+              className={`text-[11px] font-black tracking-widest transition-all ${
+                cameraMode === mode
+                  ? "text-[#CAE5B1] border-b-2 border-[#69A20D] pb-1"
+                  : "text-white/50 hover:text-white/80"
+              }`}
+            >
+              {mode}
+            </button>
+          ))}
+        </div>
+
+        <div className="flex items-center justify-between max-w-xs mx-auto">
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            className="flex flex-col items-center gap-1 group"
+          >
+            <div className="w-12 h-12 rounded-2xl bg-black/50 backdrop-blur-md flex items-center justify-center border border-white/20 group-hover:border-[#69A20D] transition-all">
               <Globe size={20} className="text-white" />
             </div>
-            <span className="text-white/80 text-[10px] font-semibold">Gallery</span>
+            <span className="text-white/70 text-[10px] font-bold">Gallery</span>
           </button>
 
-          <motion.button whileTap={{ scale: 0.9 }}
+          <motion.button
+            whileTap={{ scale: 0.92 }}
             onClick={handleShutter}
-            className="w-20 h-20 rounded-full bg-white flex items-center justify-center shadow-2xl relative">
-            <div className="w-16 h-16 rounded-full bg-[#23351F] flex items-center justify-center">
-              <Camera size={28} className="text-white" />
+            className="w-20 h-20 rounded-full bg-white/20 p-1 flex items-center justify-center shadow-2xl relative border border-white/40"
+          >
+            <div className="w-16 h-16 rounded-full bg-[#23351F] border-2 border-white flex items-center justify-center shadow-inner">
+              <Camera size={26} className="text-[#CAE5B1]" />
             </div>
-            {scanning && <motion.div className="absolute inset-0 rounded-full border-2 border-[#69A20D]"
-              animate={{ scale: [1, 1.3], opacity: [1, 0] }} transition={{ duration: 0.6, repeat: Infinity }} />}
+
+            {scanning && (
+              <motion.div
+                className="absolute inset-0 rounded-full border-2 border-[#69A20D]"
+                animate={{ scale: [1, 1.35], opacity: [1, 0] }}
+                transition={{ duration: 0.6, repeat: Infinity }}
+              />
+            )}
           </motion.button>
 
-          <button onClick={() => fileInputRef.current?.click()} className="flex flex-col items-center gap-1">
-            <div className="w-12 h-12 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center border border-white/20">
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            className="flex flex-col items-center gap-1 group"
+          >
+            <div className="w-12 h-12 rounded-2xl bg-black/50 backdrop-blur-md flex items-center justify-center border border-white/20 group-hover:border-[#69A20D] transition-all">
               <Plus size={20} className="text-white" />
             </div>
-            <span className="text-white/80 text-[10px] font-semibold">Upload</span>
+            <span className="text-white/70 text-[10px] font-bold">Upload</span>
           </button>
         </div>
-        <p className="text-white/70 text-xs text-center font-medium">Tap camera to scan or select a photo from gallery</p>
       </div>
     </div>
   );
