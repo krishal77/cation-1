@@ -7,7 +7,7 @@ import {
   Trophy, Compass, Home, BookOpen, MoreHorizontal, X, Check,
   Filter, Share2, Download, Eye, Navigation, Zap, Moon, Sun,
   ChevronDown, Plus, Minus, RotateCcw, Info, Award, Map,
-  Languages, HardDrive, AlertTriangle, Coffee, Wind, Loader2, Sparkles
+  Languages, HardDrive, AlertTriangle, Coffee, Wind, Loader2, Sparkles, Smartphone
 } from "lucide-react";
 import { useAuth } from "./context/AuthContext";
 import {
@@ -2872,10 +2872,35 @@ function SettingsScreen({ onBack, onLogout }: { onBack: () => void; onLogout?: (
             </div>
           </div>
         ))}
+
+        {/* PWA App Installation Card */}
+        <div>
+          <p className="text-[#5F6B5E] text-xs font-bold uppercase tracking-wider mb-2">Device Application</p>
+          <div className="bg-[#23351F] text-white rounded-2xl p-4 shadow-md border border-[#CAE5B1]/30">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-10 h-10 rounded-xl bg-[#69A20D] flex items-center justify-center text-white shadow-sm">
+                <Smartphone size={20} />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-black font-display text-white">Install App on Phone</p>
+                <p className="text-[#CAE5B1] text-[11px] font-medium">Add to Home Screen for native experience</p>
+              </div>
+            </div>
+            <p className="text-white/80 text-xs mb-3.5 leading-relaxed">
+              Install Culture Guide AI directly onto your iPhone, Android, or Desktop. Runs standalone offline with full camera & GPS maps!
+            </p>
+            <div className="bg-black/30 rounded-xl p-3 text-[11px] text-white/90 space-y-1 mb-3">
+              <p className="font-bold text-[#CAE5B1]">📱 How to Install:</p>
+              <p>• <b>iOS (Safari):</b> Tap Share icon <span className="font-mono">[↑]</span> → select <b>"Add to Home Screen"</b></p>
+              <p>• <b>Android (Chrome):</b> Tap 3 dots <span className="font-mono">[⋮]</span> → select <b>"Install App"</b> or <b>"Add to Home Screen"</b></p>
+            </div>
+          </div>
+        </div>
+
         <div>
           <p className="text-[#5F6B5E] text-xs font-bold uppercase tracking-wider mb-2">About</p>
           <div className="bg-white rounded-2xl border border-[#E4E7EB] overflow-hidden">
-            {[{ label: "Version", val: "2.4.1" }, { label: "Privacy Policy", val: "" }, { label: "Terms of Service", val: "" }].map(item => (
+            {[{ label: "Version", val: "2.4.1 (PWA)" }, { label: "Privacy Policy", val: "" }, { label: "Terms of Service", val: "" }].map(item => (
               <div key={item.label} className="flex items-center gap-3 p-4 border-b border-[#E4E7EB] last:border-b-0">
                 <span className="flex-1 text-sm font-bold text-[#222E1C]">{item.label}</span>
                 {item.val ? <span className="text-[#5F6B5E] text-xs font-medium">{item.val}</span> : <ChevronRight size={16} className="text-[#5F6B5E]" />}
