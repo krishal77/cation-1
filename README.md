@@ -1,4 +1,4 @@
-# 🏛️ AI Tourist Guide — Mobile Experience
+# AI Tourist Guide — Mobile Experience
 
 [![React](https://img.shields.io/badge/React-18.3-blue.svg?logo=react)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6.svg?logo=typescript)](https://www.typescriptlang.org/)
@@ -11,21 +11,22 @@
 
 **AI Tourist Guide** is an intelligent, AI-powered cultural heritage companion designed for mobile devices. Powered by deep visual recognition (**OpenCLIP / PyTorch**), interactive maps, immersive audio guides, and localized storytelling, AI Tourist Guide transforms smartphone cameras into living tour guides for temples, stupas, and UNESCO World Heritage sites.
 
----
-
-## 🌟 Key Features
-
-- 📸 **AI Visual Monument Recognition**: Scan any temple, stupa, or historical monument using your camera or gallery upload. Zero-shot visual classification powered by OpenCLIP identifies heritage sites instantly.
-- 🗺️ **Interactive Heritage Map**: Explore nearby historical landmarks using interactive Leaflet map overlays, live distance markers, and custom category filter chips.
-- 🎧 **AI Audio Guide & Companion**: Interactive voice-guided walkthroughs with real-time cultural Q&A assistant ("Ara", the Himalayan Guardian Spirit).
-- 📜 **Cultural Storytelling**: Generates deep historical narratives, mythologies, architectural insights, and visitor tips for recognized sites.
-- 🎖️ **Digital Passport & Achievements**: Earn virtual stamps, collect heritage badges, and track your site visits across UNESCO landmarks.
-- 📶 **Offline Mode & Data Packs**: Downloadable regional heritage packs for exploring remote historical areas without an active cellular connection.
-- 📱 **Cross-Platform Native Mobile & PWA**: Runs seamlessly as a progressive web app (PWA) with native mobile device camera integration, or builds directly into a native Android APK via Capacitor.
 
 ---
 
-## 🏗️ System Architecture
+## Key Features
+
+- **AI Visual Monument Recognition** — Scan any temple, stupa, or historical monument using your camera or gallery upload. Zero-shot visual classification powered by OpenCLIP identifies heritage sites instantly.
+- **Interactive Heritage Map** — Explore nearby historical landmarks using interactive Leaflet map overlays, live distance markers, and custom category filter chips.
+- **AI Audio Guide & Companion** — Interactive voice-guided walkthroughs with real-time cultural Q&A assistant ("Ara", the Himalayan Guardian Spirit).
+- **Cultural Storytelling** — Generates deep historical narratives, mythologies, architectural insights, and visitor tips for recognized sites.
+- **Digital Passport & Achievements** — Earn virtual stamps, collect heritage badges, and track your site visits across UNESCO landmarks.
+- **Offline Mode & Data Packs** — Downloadable regional heritage packs for exploring remote historical areas without an active cellular connection.
+- **Cross-Platform Native Mobile & PWA** — Runs seamlessly as a progressive web app (PWA) with native mobile device camera integration, or builds directly into a native Android APK via Capacitor.
+
+---
+
+## System Architecture
 
 ```mermaid
 graph TD
@@ -63,7 +64,7 @@ graph TD
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 ### Frontend & Mobile
 - **Core**: React 18, TypeScript, Vite 6
@@ -84,47 +85,100 @@ graph TD
 
 ---
 
-## 📁 Folder Structure
+## Folder Structure
+
+This project is organized as a **monorepo** with three isolated service directories.
 
 ```
-AI Tourist Guide/
-├── src/                          # Modular React / TypeScript App
-│   ├── app/
-│   │   ├── components/common/   # Reusable UI components (Buttons, Cards, NavBar, PhoneFrame)
-│   │   ├── constants/           # Static data, onboarding slides & site images
-│   │   ├── context/             # AuthContext state provider
-│   │   ├── screens/             # Modular domain views
-│   │   │   ├── auth/            # Splash, Onboarding, Login, Register
-│   │   │   ├── explore/         # Map, Directory Explorer, Search
-│   │   │   ├── home/            # Main Dashboard
-│   │   │   ├── scan/            # Camera Scanner, AI Processing, Result View
-│   │   │   ├── site/            # Site Details, AI Story, Audio Guide
-│   │   │   ├── system/          # Offline Mode, Error View
-│   │   │   └── user/            # Saved, History, Achievements, Profile, Settings
-│   │   ├── services/            # API client service methods
-│   │   ├── types/               # TypeScript interfaces & screen unions
-│   │   └── App.tsx              # Application Root Router
-│   └── styles/                  # Global CSS & Tailwind imports
-├── server/                      # Node.js Express REST Backend
-│   ├── controllers/             # Authentication & Heritage Controllers
-│   ├── models/                  # MongoDB Schemas (User, Site, Visit)
-│   ├── routes/                  # Express Router endpoints
-│   └── server.js                # Server entry point (Port 5001)
-├── ai-service/                  # Python OpenCLIP Microservice
-│   ├── core/                    # OpenCLIP feature extraction engine
-│   ├── data/                    # Heritage site reference embeddings
-│   ├── main.py                  # FastAPI server entry point
-│   └── requirements.txt         # Python dependencies
-├── android/                     # Capacitor Native Android Project
-│   └── app/src/main/            # Android Manifest & Native Assets
-├── capacitor.config.json        # Capacitor configuration
-├── vite.config.ts               # Vite bundler & basicSSL HTTPS config
-└── package.json                 # Web dependencies & build scripts
+AI Tourist Guide/                        ← Monorepo root
+├── .gitignore
+├── .vscode/
+├── README.md
+├── pnpm-workspace.yaml                  ← Workspace config (frontend + backend)
+│
+├── frontend/                            ← React / Ionic Capacitor App
+│   ├── android/                         ← Capacitor native Android project
+│   ├── public/                          ← Static assets (icons, APK download)
+│   ├── dist/                            ← Production build output
+│   ├── src/
+│   │   ├── main.tsx                     ← App entry point
+│   │   ├── app/
+│   │   │   ├── App.tsx                  ← Root router
+│   │   │   ├── components/
+│   │   │   │   ├── common/              ← Reusable UI (Buttons, Cards, NavBar)
+│   │   │   │   ├── figma/               ← Figma-synced design components
+│   │   │   │   └── ui/                  ← Base design system primitives
+│   │   │   ├── constants/               ← Static data, onboarding, site images
+│   │   │   ├── context/                 ← AuthContext state provider
+│   │   │   ├── screens/                 ← Domain screen modules
+│   │   │   │   ├── auth/                ← Splash, Onboarding, Login, Register
+│   │   │   │   ├── explore/             ← Map, Directory, Search
+│   │   │   │   ├── home/                ← Main Dashboard
+│   │   │   │   ├── scan/                ← Camera Scanner, AI Processing, Result
+│   │   │   │   ├── site/                ← Site Details, AI Story, Audio Guide
+│   │   │   │   ├── system/              ← Offline Mode, Error View
+│   │   │   │   └── user/                ← Profile, History, Achievements, Settings
+│   │   │   ├── services/
+│   │   │   │   └── api.ts               ← API client (Axios/fetch wrappers)
+│   │   │   └── types/
+│   │   │       └── screen.ts            ← TypeScript screen interfaces
+│   │   └── styles/                      ← Global CSS & Tailwind imports
+│   ├── index.html
+│   ├── vite.config.ts                   ← Vite + basicSSL + proxy config
+│   ├── postcss.config.mjs
+│   ├── capacitor.config.json
+│   ├── default_shadcn_theme.css
+│   └── package.json
+│
+├── backend/                             ← Node.js / Express REST API
+│   ├── src/
+│   │   ├── config/
+│   │   │   └── db.js                    ← MongoDB connection
+│   │   ├── controllers/
+│   │   │   ├── authController.js
+│   │   │   ├── heritageController.js
+│   │   │   ├── recognitionController.js
+│   │   │   └── storyController.js
+│   │   ├── middleware/
+│   │   │   ├── authMiddleware.js        ← JWT verification
+│   │   │   └── errorMiddleware.js       ← Global error & 404 handler
+│   │   ├── models/
+│   │   │   ├── HeritageSite.js
+│   │   │   ├── User.js
+│   │   │   └── VisitHistory.js
+│   │   ├── routes/
+│   │   │   ├── authRoutes.js
+│   │   │   ├── heritageRoutes.js
+│   │   │   ├── recognitionRoutes.js
+│   │   │   └── storyRoutes.js
+│   │   └── services/
+│   │       ├── aiService.js             ← Calls Python AI microservice
+│   │       └── storyService.js          ← AI story generation logic
+│   ├── server.js                        ← Express entry point (Port 5001)
+│   ├── .env                             ← Secret config (not committed)
+│   ├── .env.example                     ← Example env template
+│   └── package.json
+│
+└── ai/                                  ← Python OpenCLIP Vision Microservice
+    ├── core/
+    │   ├── clip_model.py                ← OpenCLIP model loader
+    │   ├── embedding.py                 ← Feature extraction
+    │   └── matcher.py                   ← Cosine similarity matcher
+    ├── data/
+    │   ├── heritage.json                ← Heritage site reference data
+    │   └── images/                      ← Reference image assets
+    ├── database/
+    │   └── embeddings.pkl               ← Pre-computed site embeddings
+    ├── scripts/
+    │   └── create_embeddings.py         ← Embedding generation script
+    ├── main.py                          ← FastAPI server entry point (Port 8000)
+    ├── requirements.txt                 ← Python dependencies
+    └── pyrightconfig.json
 ```
 
 ---
 
-## 🚀 Quick Start Guide
+## Quick Start Guide
 
 ### Prerequisites
 - **Node.js**: `v18.x` or higher
@@ -133,23 +187,24 @@ AI Tourist Guide/
 
 ---
 
-### 1. Clone & Install Frontend Dependencies
+### 1. Clone the Repository
 
 ```bash
 git clone https://github.com/krishal77/cation-1.git
 cd "AI Tourist Guide"
-
-# Install frontend packages
-npm install
 ```
 
 ---
 
 ### 2. Configure Environment Variables
 
-Create `.env` files in both backend and AI service directories:
+Copy the example env file and fill in your values:
 
-**Backend (`server/.env`):**
+```bash
+cp backend/.env.example backend/.env
+```
+
+**`backend/.env`:**
 ```env
 PORT=5001
 MONGODB_URI=mongodb://localhost:27017/culture_guide_ai
@@ -163,17 +218,17 @@ AI_SERVICE_URL=http://localhost:8000
 
 #### A. Node.js Backend Server
 ```bash
-cd server
+cd backend
 npm install
-npm run dev
+node server.js
 ```
 *(Runs on `http://localhost:5001`)*
 
-#### B. Python AI Vision Microservice (Optional for offline AI testing)
+#### B. Python AI Vision Microservice *(optional — for visual recognition)*
 ```bash
-cd ai-service
+cd ai
 python3 -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+source venv/bin/activate       # Windows: venv\Scripts\activate
 pip install -r requirements.txt
 python main.py
 ```
@@ -181,43 +236,49 @@ python main.py
 
 #### C. React Frontend Application
 ```bash
-# In the root directory:
+cd frontend
+npm install
 npm run dev
 ```
-*(Runs on `https://localhost:5173` or local Wi-Fi IP `https://192.168.x.x:5173` with auto-generated SSL for mobile browser camera support)*
+*(Runs on `https://localhost:5173` — self-signed SSL is auto-generated for mobile camera access)*
 
 ---
 
-## 📱 Mobile Deployment & Testing
+## Mobile Deployment & Testing
 
 ### Option 1: Mobile Browser PWA (Instant Wi-Fi Access)
-1. Run `npm run dev` on your computer.
-2. Open the network URL displayed in terminal (e.g. `https://192.168.1.106:5173/`) in **Chrome** (Android) or **Safari** (iOS).
-3. Accept the local self-signed SSL warning (required for Web Camera access over local Wi-Fi).
-4. Tap **"Add to Home Screen"** or **"Install App"** in your browser menu to run standalone!
+1. Run `npm run dev` inside `frontend/`.
+2. Open the network URL shown in terminal (e.g. `https://192.168.1.x:5173/`) in **Chrome** (Android) or **Safari** (iOS).
+3. Accept the local self-signed SSL warning (required for Web Camera API over local Wi-Fi).
+4. Tap **"Add to Home Screen"** to install as a standalone app.
 
 ### Option 2: Native Android APK (via Capacitor)
 ```bash
-# Build the production bundle & sync with native Android project
+# From inside the frontend/ directory:
 npm run build
 npx cap sync android
-
-# Open project in Android Studio to build .apk or deploy directly
 npx cap open android
 ```
+Then build or run the APK from Android Studio.
 
 ---
 
-## 🧪 Verification & Building
+## Verification & Building
 
-To verify TypeScript static types and build the production bundle:
-
+To type-check and build the production bundle:
 ```bash
+cd frontend
 npm run build
 ```
 
+To verify the backend is running:
+```bash
+curl http://localhost:5001/health
+```
+Expected response: `{"status":"ok","service":"culture-guide-express-server",...}`
+
 ---
 
-## 📄 License
+## License
 
 This project is licensed under the [MIT License](LICENSE).
